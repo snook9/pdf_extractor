@@ -2,18 +2,12 @@
 # Authors: Jonathan CASSAING
 # Tool for parsing and extracting PDF file content
 
+from flask import Blueprint, request
 
-import config
-from flask import Flask
-from flask import request
+bp = Blueprint('router', __name__, template_folder='templates')
 
-
-config = config.configure()
-app = Flask(__name__)
-
-
-@app.route('/', methods=['GET', 'POST'])
-def main():
+@bp.route('/', methods=['GET', 'POST'])
+def index():
     if request.method == 'POST':
         request.form
     else:
