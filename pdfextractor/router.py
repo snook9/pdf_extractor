@@ -9,7 +9,8 @@ bp = Blueprint('router', __name__, template_folder='templates')
 @bp.route('/', methods=['GET', 'POST'])
 def index():
     if request.method == 'POST':
-        request.form
+        print(request.form)
+        output = 'data received'
     else:
         output = '<h1>Bienvenue</h1>'
     
