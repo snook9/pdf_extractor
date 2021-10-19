@@ -2,9 +2,13 @@
 # Authors: Jonathan CASSAING
 # Tool for parsing and extracting PDF file content
 
-def test_index(client):
-    response = client.get("/")
-    assert response.data == b"""
+class PagesController:
+    def index(request):
+        if request.method == 'POST':
+            print(request.form)
+            return b'data received'
+        else:
+            return b"""
             <!doctype html>
             <title>Upload new file</title>
             <h1>Wellcome<h1>
@@ -14,7 +18,3 @@ def test_index(client):
             <input type=submit value=Upload>
             </form>
             """
-
-def test_index_post(client):
-    response = client.post("/")
-    assert response.data == b"data received"
