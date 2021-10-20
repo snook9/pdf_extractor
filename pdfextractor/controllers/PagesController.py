@@ -8,7 +8,7 @@ from flask import current_app as app
 from werkzeug.utils import secure_filename
 
 class PagesController:
-    def __allowed_file(filename):
+    def _allowed_file(filename):
         return '.' in filename and filename.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']
 
     def index(request):
@@ -25,7 +25,7 @@ class PagesController:
             if file.filename == '':
                 #flash('No selected file')
                 return redirect(url_for('router.index', message="No selected file"))
-            if file and PagesController.__allowed_file(file.filename):
+            if file and PagesController._allowed_file(file.filename):
                 filename = secure_filename(file.filename)
                 file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
                 return redirect(url_for('router.index', message="The file \'" + filename + "\' has been sent successfully!"))
