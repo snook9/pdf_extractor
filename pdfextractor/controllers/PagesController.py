@@ -6,15 +6,26 @@ import os
 from flask import redirect, url_for, render_template
 from flask import current_app as app
 from werkzeug.utils import secure_filename
+from pdfextractor.models.FileModel import FileModel
 
 class PagesController:
+    def __init__(self: object):
+        pass
+
+    @staticmethod
     def _allowed_file(filename):
+        """Check is the file extension is allowed according to the config.cfg file.
+
+        Args:
+            filename (str): file to check.
+
+        Returns:
+            bool: True if the extension of the filename is allowed, otherwise - returns False.
+        """
         return '.' in filename and filename.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']
 
-    def index(request):
+    def index(self, request):
         if request.method == 'POST':
-            #print(request.form)
-            #return b'data received'
             # check if the post request has the file part
             if 'file' not in request.files:
                 #flash('No file part')
@@ -28,6 +39,7 @@ class PagesController:
             if file and PagesController._allowed_file(file.filename):
                 filename = secure_filename(file.filename)
                 file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                FileModel().persist(filename)
                 return redirect(url_for('router.index', message="The file \'" + filename + "\' has been sent successfully!"))
             return redirect(url_for('router.index', message="This file's type is not allowed!"))
         else:

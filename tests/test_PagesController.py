@@ -4,11 +4,10 @@
 
 import unittest
 import pdfextractor.controllers.PagesController as PagesController
+from pdfextractor import create_app
 
 class test_PagesController(unittest.TestCase):
-
-    pageController = PagesController.PagesController()
-
     def test_allowed_file(self):
-        result = self.pageController._allowed_file('file.pdf')
-        self.assertEqual(50, 50)  
+        with create_app({"TESTING": True}).app_context():
+            result = PagesController.PagesController()._allowed_file('file.pdf')
+            self.assertEqual(50, 50)
