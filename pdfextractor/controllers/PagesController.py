@@ -3,7 +3,7 @@
 # Tool for parsing and extracting PDF file content
 
 import os
-from flask import redirect, url_for
+from flask import redirect, url_for, render_template
 from flask import current_app as app
 from werkzeug.utils import secure_filename
 
@@ -28,17 +28,11 @@ class PagesController:
             if file and PagesController.__allowed_file(file.filename):
                 filename = secure_filename(file.filename)
                 file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-                return redirect(url_for('router.index', message=filename))
+                return redirect(url_for('router.index', message="The file \'" + filename + "\' has been sent successfully!"))
             return redirect(url_for('router.index', message="This file's type is not allowed!"))
         else:
             message = request.args.get('message')
-            return b"""
-            <!doctype html>
-            <title>Upload new file</title>
-            <h1>Wellcome<h1>
-            <h3>Here you will find a zen space, where you can send a file in all serenity.</h3>
-            <form method=post enctype=multipart/form-data>
-            <input type=file name=file>
-            <input type=submit value=Upload>
-            </form>
-            """
+            if None == message:
+                message = ''
+
+            return render_template('index.html', title="page", message=message)
