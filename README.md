@@ -31,7 +31,11 @@ Or on Windows cmd::
     > flask run
 
 Open http://127.0.0.1:5000 in a browser.
-Post a file to the server : curl -d @article.pdf http://localhost:5000
+Post a file to the server :
+    
+    $ curl -F 'file=@article.pdf' localhost:5000
+
+The posted files will be stored in the 'data' directory, according to the 'config.cfg' file.
 
 ## Test
 
