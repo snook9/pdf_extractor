@@ -1,6 +1,7 @@
 # PdFExtractor settings
 uploads/*
 data/*
+instance/*.db
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

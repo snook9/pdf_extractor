@@ -7,6 +7,7 @@ from datetime import datetime
 from pathlib import Path
 from flask import current_app as app
 from shutil import copyfile
+from sqlalchemy import Table, Column, Integer, String, MetaData
 
 class FileModel:
     def __init__(self: object):
@@ -14,6 +15,17 @@ class FileModel:
         if False == self._output_folder.exists():
             self._output_folder.mkdir()
         pass
+
+    @staticmethod
+    def getTable(meta: MetaData()) -> Table():
+        files = Table(
+        'files', meta, 
+        Column('id', Integer, primary_key = True), 
+        Column('content', String), 
+        Column('datetime', String), 
+        )
+        return files
+
 
     def persist(self, filename: str):
         today = datetime.today()

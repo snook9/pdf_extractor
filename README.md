@@ -33,7 +33,7 @@ Or on Windows cmd::
 Open http://127.0.0.1:5000 in a browser.
 Post a file to the server :
     
-    $ curl -F 'file=@article.pdf' localhost:5000
+    $ curl -F 'file=@tests/article.pdf' localhost:5000
 
 The posted files will be stored in the 'data' directory, according to the 'config.cfg' file.
 
