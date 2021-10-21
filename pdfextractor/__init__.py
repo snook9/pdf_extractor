@@ -3,7 +3,7 @@
 # Tool for parsing and extracting PDF file content
 
 from flask import Flask
-from sqlalchemy import create_engine, Table, Column, Integer, String, MetaData
+from sqlalchemy import create_engine, MetaData
 
 from pdfextractor.models.FileModel import FileModel
 
@@ -11,7 +11,7 @@ def create_db():
     engine = create_engine('sqlite:///instance/pdfextractor.db', echo = True)
     meta = MetaData()
 
-    files = FileModel.getTable(meta)
+    FileModel.initTable(meta)
 
     meta.create_all(engine)
 

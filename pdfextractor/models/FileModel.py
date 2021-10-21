@@ -9,7 +9,9 @@ from flask import current_app as app
 from shutil import copyfile
 from sqlalchemy import Table, Column, Integer, String, MetaData
 
-class FileModel:
+class FileModel():
+    _database_table = Table
+
     def __init__(self: object):
         self._output_folder = Path(app.config['DATA_FOLDER'])
         if False == self._output_folder.exists():
@@ -17,15 +19,14 @@ class FileModel:
         pass
 
     @staticmethod
-    def getTable(meta: MetaData()) -> Table():
-        files = Table(
-        'files', meta, 
+    def initTable(meta: MetaData()) -> Table():
+        _database_table = Table(
+        'file', meta, 
         Column('id', Integer, primary_key = True), 
         Column('content', String), 
         Column('datetime', String), 
         )
-        return files
-
+        return _database_table
 
     def persist(self, filename: str):
         today = datetime.today()
