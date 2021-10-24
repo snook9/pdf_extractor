@@ -41,6 +41,6 @@ class ArticleModel(Base):
                 data = pdftotext.PDF(f)
                 with open(output_filepath, 'w') as f:
                     f.write('\n'.join(data))
-                    self._persist(data, output_filepath)
+                    self._persist(''.join(data), output_filepath)
                     return 0
         return -1
