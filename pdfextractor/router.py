@@ -9,6 +9,7 @@ from pdfextractor.controllers.PagesController import PagesController
 bp = Blueprint('router', __name__, template_folder='templates')
 
 @bp.route('/', methods=['GET', 'POST'])
+@bp.route('/documents', methods=['GET', 'POST'])
 def index():
     pagesController = PagesController()
     return pagesController.index(request)

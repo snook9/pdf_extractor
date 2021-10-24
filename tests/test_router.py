@@ -3,9 +3,11 @@
 # Tool for parsing and extracting PDF file content
 
 def test_index(client):
+    """Test the index route
+    """
     response = client.get("/")
     assert response.status == '200 OK'
-
-def test_index_post(client):
+    response = client.get("/documents")
+    assert response.status == '200 OK'
     response = client.post("/")
     assert response.status == '302 FOUND'
