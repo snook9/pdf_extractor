@@ -7,26 +7,23 @@ from datetime import datetime
 from pathlib import Path
 from flask import current_app as app
 from shutil import copyfile
-from sqlalchemy import Table, Column, Integer, String, MetaData
+from sqlalchemy import Column, Integer, String
+from pdfextractor.common.base import Base
+from pdfextractor.common.base import session_factory
 
-class FileModel():
-    _database_table = Table
+class FileModel(Base):
+    __tablename__ = 'file'
+    id=Column(Integer, primary_key=True)
+    content=Column('content', String())
+    datetime=Column('datetime', String(255))
 
-    def __init__(self: object):
+    def __init__(self: object, content=None, datetime=None):
+        self.content = content
+        self.datetime = datetime
+
         self._output_folder = Path(app.config['DATA_FOLDER'])
         if False == self._output_folder.exists():
             self._output_folder.mkdir()
-        pass
-
-    @staticmethod
-    def initTable(meta: MetaData()) -> Table():
-        _database_table = Table(
-        'file', meta, 
-        Column('id', Integer, primary_key = True), 
-        Column('content', String), 
-        Column('datetime', String), 
-        )
-        return _database_table
 
     def persist(self, filename: str):
         today = datetime.today()
@@ -39,3 +36,9 @@ class FileModel():
                     f.write('\n'.join(data))
         elif "txt" == filename.rsplit('.', 1)[1].lower():
             copyfile(filename, output_filepath)
+            session = session_factory()
+            self.content = "JoeJoe"
+            self.datetime = "09/04/1988"
+            session.add(self)
+            session.commit()
+            session.close()
