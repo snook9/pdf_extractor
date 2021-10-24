@@ -54,3 +54,7 @@ class PagesController:
                 message = ''
 
             return render_template('index.html', title="page", message=message)
+    
+    def getDocument(self, request, id: int):
+        if request.method == 'GET':
+            return render_template('index.html', title="page", message=id)

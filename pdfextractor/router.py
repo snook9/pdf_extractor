@@ -13,3 +13,8 @@ bp = Blueprint('router', __name__, template_folder='templates')
 def index():
     pagesController = PagesController()
     return pagesController.index(request)
+
+@bp.route('/documents/<int:id>', methods=['GET'])
+def getDocument(id):
+    pagesController = PagesController()
+    return pagesController.getDocument(request, id)
