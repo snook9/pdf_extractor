@@ -6,7 +6,7 @@ import os
 from flask import redirect, url_for, render_template
 from flask import current_app as app
 from werkzeug.utils import secure_filename
-from pdfextractor.models.FileModel import FileModel
+from pdfextractor.models.ArticleModel import ArticleModel
 
 class PagesController:
     def __init__(self: object):
@@ -42,7 +42,8 @@ class PagesController:
             if file and PagesController._allowed_file(file.filename):
                 filename = secure_filename(file.filename)
                 file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-                FileModel().persist(filename)
+                if -1 == ArticleModel().persist(filename):
+                    return redirect(url_for('router.index', message="This file's type is not allowed!"))
                 return redirect(url_for('router.index', message="The file \'" + filename + "\' has been sent successfully!"))
                 
             return redirect(url_for('router.index', message="This file's type is not allowed!"))
