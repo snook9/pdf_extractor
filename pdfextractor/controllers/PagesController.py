@@ -42,9 +42,10 @@ class PagesController:
             if file and PagesController._allowed_file(file.filename):
                 filename = secure_filename(file.filename)
                 file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-                if -1 == ArticleModel().persist(filename):
+                id = ArticleModel().persist(filename)
+                if -1 == id:
                     return redirect(url_for('router.index', message="This file's type is not allowed!"))
-                return redirect(url_for('router.index', message="The file \'" + filename + "\' has been sent successfully!"))
+                return redirect(url_for('router.index', id=id, message="The file \'" + filename + "\' has been sent successfully!"))
                 
             return redirect(url_for('router.index', message="This file's type is not allowed!"))
         else:

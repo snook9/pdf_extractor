@@ -12,13 +12,14 @@ from pdfextractor.common.base import session_factory
 
 class ArticleModel(Base):
     __tablename__ = 'file'
-    id=Column(Integer, primary_key=True)
-    content=Column('content', String)
-    datetime=Column('datetime', String(255))
+    _id=Column('id', Integer, primary_key=True)
+    _content=Column('content', String)
+    _datetime=Column('datetime', String(255))
+    id=-1
 
-    def __init__(self: object, content=None, datetime=None):
-        self.content = content
-        self.datetime = datetime
+    def __init__(self: object, content: str=None, datetime: str=None):
+        self._content = str(content)
+        self._datetime = str(datetime)
 
         self._output_folder = Path(app.config['DATA_FOLDER'])
         if False == self._output_folder.exists():
@@ -26,10 +27,11 @@ class ArticleModel(Base):
 
     def _persist(self, content: str, datetime: str):
         session = session_factory()
-        self.content = str(content)
-        self.datetime = str(datetime)
+        self._content = str(content)
+        self._datetime = str(datetime)
         session.add(self)
         session.commit()
+        self.id = self._id
         session.close()
 
     def persist(self, filename: str):
@@ -42,5 +44,5 @@ class ArticleModel(Base):
                 with open(output_filepath, 'w') as f:
                     f.write('\n'.join(data))
                     self._persist(''.join(data), output_filepath)
-                    return 0
+                    return self.id
         return -1
