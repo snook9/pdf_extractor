@@ -9,5 +9,7 @@ _SessionFactory = sessionmaker(bind=engine)
 Base = declarative_base()
 
 def session_factory():
+    """Returns a session factory to simplify database access
+    """
     Base.metadata.create_all(engine)
     return _SessionFactory()

@@ -3,9 +3,10 @@
 # Tool for parsing and extracting PDF file content
 
 from flask import Flask
+from pdfextractor import router
 
 def create_app(test_config=None):
-    # create and configure the app
+    # create and configure the app with the factory pattern
     app = Flask(__name__, instance_relative_config=True)
 
     if test_config is None:
@@ -16,7 +17,7 @@ def create_app(test_config=None):
         app.config.from_pyfile('config.py', silent=False)
         app.config.update(test_config)
 
-    from pdfextractor import router
+    # Register the router
     app.register_blueprint(router.bp)
 
     return app

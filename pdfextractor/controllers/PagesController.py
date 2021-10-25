@@ -31,11 +31,21 @@ class PagesController:
         return '.' in filename and filename.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']
 
     def index(self, request):
+        """Index of the API.
+        GET method returns an HTML upload form.
+        POST method can be used to upload a PDF file.
+            See README.md for response format.
+
+        Returns:
+            flask.Response: standard flask HTTP response.
+        """
+        # If it's a POST request (the client try to send a file)
         if request.method == 'POST':
             # check if the post request has the file part
             if 'file' not in request.files:
                 return Response(json.dumps(MessageModel("No file part"), cls=MessageEncoder), mimetype='application/json;charset=utf-8')
 
+            # Else, we get the file
             file = request.files['file']
 
             # if user does not select file, browser also
@@ -43,29 +53,52 @@ class PagesController:
             if file.filename == '':
                 return Response(json.dumps(MessageModel("No selected file"), cls=MessageEncoder), mimetype='application/json;charset=utf-8')
 
+            # If the file's type is allowed
             if file and PagesController._allowed_file(file.filename):
+                # Check user input
                 filename = secure_filename(file.filename)
+                # Save the file in an upload folder
                 file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                # Persist the file in the database
                 id = ArticleModel().persist(filename)
+                # If failed
                 if None == id:
+                    # Returns the appropriate error
                     return Response(json.dumps(MessageModel("This file's type is not allowed!"), cls=MessageEncoder), mimetype='application/json;charset=utf-8')
+                # Else, returning the ID of the object in the database
                 return Response(json.dumps(MessageModel("The file \'" + filename + "\' has been sent successfully!", id), cls=MessageEncoder), mimetype='application/json;charset=utf-8')
 
+            # Else, the file's type is not allowed
             return Response(json.dumps(MessageModel("This file's type is not allowed!"), cls=MessageEncoder), mimetype='application/json;charset=utf-8')
         else:
+            # Check if the application returns a message
+            # NO MORE USED CURRENTLY
             message = request.args.get('message')
             if None == message:
                 message = ''
 
+            # Generate an index HTML page with an outstanding look & feel
             return render_template('index.html', title="page", message=message)
     
     def getDocument(self, request, id: int):
+        """Index of the API.
+        GET method returns metadata about the document, specified by the ID parameter.
+            See README.md for response format.
+
+        Returns:
+            flask.Response: standard flask HTTP response.
+        """
         if request.method == 'GET':
-            stmt = select(ArticleModel).where(ArticleModel.id == id)         
+            # Preparing the query for the ID
+            stmt = select(ArticleModel).where(ArticleModel.id == id)
+            # Retreive the session
             session = session_factory()
+            # Executing the query
             result = session.execute(stmt)
             json_data = None
+            # Parsing the result
             for user_obj in result.scalars():
+                # Converting the object to JSON string
                 json_data = json.dumps(user_obj, cls=ArticleEncoder)
                 # We leave the for and return the first element (cause "normaly", there is only one row)
                 return Response(json_data, mimetype='application/json;charset=utf-8')

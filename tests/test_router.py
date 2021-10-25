@@ -9,5 +9,3 @@ def test_index(client):
     assert response.status == '200 OK'
     response = client.get("/documents")
     assert response.status == '200 OK'
-    response = client.post("/")
-    assert response.status == '302 FOUND'

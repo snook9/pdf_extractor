@@ -12,22 +12,45 @@ from pdfextractor.common.base import Base
 from pdfextractor.common.base import session_factory
 
 class ArticleModel(Base):
+    """Class for representing Article entity and his Data Access Object
+
+    This class can be used to persist the object in the database AND
+    to save the Article in a basic text file. 
+    """
+    # Table name in the database
     __tablename__ = 'file'
+    # ID primary key in the database
     id=Column('id', Integer, primary_key=True)
+    # Datetime column in the database
     datetime=Column('datetime', String(255))
+    # Content column in the database
     content=Column('content', String)
     # Internal ID is used to store the real ID (in database) after the session close
     _internal_id=None
 
     def __init__(self: object, datetime: str=None, content: str=None):
+        """Initialize the object
+
+        Args:
+            datetime (str, optional): to force datetime. Defaults to None.
+            content (str, optional): to force content. Defaults to None.
+        """
         self.datetime = str(datetime)
         self.content = str(content)
 
+        # Configure the folder where text files will be saved
         self._output_folder = Path(app.config['DATA_FOLDER'])
         if False == self._output_folder.exists():
+            # If the folder doesn't exist, we create it
             self._output_folder.mkdir()
 
     def _persist(self, datetime: str, content: str):
+        """Private method to persist the object in the database
+
+        Args:
+            datetime (str): datetime field
+            content (str): content field
+        """
         session = session_factory()
         self.datetime = str(datetime)
         self.content = str(content)
@@ -38,7 +61,16 @@ class ArticleModel(Base):
         session.close()
 
     def persist(self, filename: str):
+        """Public method to extract then persist a PDF file content in the database
+
+        Args:
+            filename (str): filename of the target file
+
+        Returns:
+            int: ID of the persisted object in the database, otherwise - returns None if the file's type is not supported.
+        """
         today = datetime.today().strftime("%Y-%m-%d-%H-%M-%S.%f")
+        # Create a unique filename
         output_filepath = self._output_folder / Path('file_' + today + '.txt')
 
         if "pdf" == filename.rsplit('.', 1)[1].lower():
@@ -51,6 +83,8 @@ class ArticleModel(Base):
         return None
 
 class ArticleEncoder(json.JSONEncoder):
+    """Class for converting object to JSON string
+    """
     def default(self, o): 
         if isinstance(o, ArticleModel):
             id = o.id
