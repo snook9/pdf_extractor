@@ -4,12 +4,15 @@
 
 import os
 import json
-from flask import Response, jsonify, redirect, url_for, render_template
+from flask import Response, render_template
 from flask import current_app as app
 from werkzeug.utils import secure_filename
 from pdfextractor.models.ArticleModel import ArticleEncoder, ArticleModel
+from pdfextractor.models.MessageModel import MessageEncoder, MessageModel
 from pdfextractor.common.base import session_factory
 from sqlalchemy import select
+
+from pdfextractor.models.MessageModel import MessageModel
 
 class PagesController:
     def __init__(self: object):
@@ -31,25 +34,23 @@ class PagesController:
         if request.method == 'POST':
             # check if the post request has the file part
             if 'file' not in request.files:
-                #flash('No file part')
-                return redirect(url_for('router.index', message="No file part"))
+                return Response(json.dumps(MessageModel("No file part"), cls=MessageEncoder), mimetype='application/json;charset=utf-8')
 
             file = request.files['file']
 
             # if user does not select file, browser also
             # submit an empty part without filename
             if file.filename == '':
-                #flash('No selected file')
-                return redirect(url_for('router.index', message="No selected file"))
+                return Response(json.dumps(MessageModel("No selected file"), cls=MessageEncoder), mimetype='application/json;charset=utf-8')
 
             if file and PagesController._allowed_file(file.filename):
                 filename = secure_filename(file.filename)
                 file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
                 if None == ArticleModel().persist(filename):
-                    return redirect(url_for('router.index', message="This file's type is not allowed!"))
-                return redirect(url_for('router.index', id=id, message="The file \'" + filename + "\' has been sent successfully!"))
-                
-            return redirect(url_for('router.index', message="This file's type is not allowed!"))
+                    return Response(json.dumps(MessageModel("This file's type is not allowed!"), cls=MessageEncoder), mimetype='application/json;charset=utf-8')
+                return Response(json.dumps(MessageModel("The file \'" + filename + "\' has been sent successfully!"), cls=MessageEncoder), mimetype='application/json;charset=utf-8')
+
+            return Response(json.dumps(MessageModel("This file's type is not allowed!"), cls=MessageEncoder), mimetype='application/json;charset=utf-8')
         else:
             message = request.args.get('message')
             if None == message:
@@ -64,7 +65,8 @@ class PagesController:
             result = session.execute(stmt)
             json_data = None
             for user_obj in result.scalars():
-                #print(f"{user_obj.content} {user_obj.datetime}")
                 json_data = json.dumps(user_obj, cls=ArticleEncoder)
-            # Fin du code temporaire
-            return Response(json_data, mimetype='application/json;charset=utf-8')
+                # We leave the for and return the first element (cause "normaly", there is only one row)
+                return Response(json_data, mimetype='application/json;charset=utf-8')
+            # Else, no document found
+            return Response(json.dumps(MessageModel("No document found"), cls=MessageEncoder), mimetype='application/json;charset=utf-8')
