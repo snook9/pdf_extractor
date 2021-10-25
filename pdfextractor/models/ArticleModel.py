@@ -12,10 +12,11 @@ from pdfextractor.common.base import session_factory
 
 class ArticleModel(Base):
     __tablename__ = 'file'
-    _id=Column('id', Integer, primary_key=True)
-    _content=Column('content', String)
-    _datetime=Column('datetime', String(255))
-    id=-1
+    id=Column('id', Integer, primary_key=True)
+    content=Column('content', String)
+    datetime=Column('datetime', String(255))
+    # Internal ID is used to store the real ID (in database) after the session close
+    _internal_id=None
 
     def __init__(self: object, content: str=None, datetime: str=None):
         self._content = str(content)
@@ -31,7 +32,8 @@ class ArticleModel(Base):
         self._datetime = str(datetime)
         session.add(self)
         session.commit()
-        self.id = self._id
+        # We save the ID cause it will wiped after the session.close()
+        self._internal_id = self.id
         session.close()
 
     def persist(self, filename: str):
@@ -44,5 +46,5 @@ class ArticleModel(Base):
                 with open(output_filepath, 'w') as f:
                     f.write('\n'.join(data))
                     self._persist(''.join(data), output_filepath)
-                    return self.id
-        return -1
+                    return self._internal_id
+        return None

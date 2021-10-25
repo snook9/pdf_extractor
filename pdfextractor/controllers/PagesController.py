@@ -42,8 +42,7 @@ class PagesController:
             if file and PagesController._allowed_file(file.filename):
                 filename = secure_filename(file.filename)
                 file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-                id = ArticleModel().persist(filename)
-                if -1 == id:
+                if None == ArticleModel().persist(filename):
                     return redirect(url_for('router.index', message="This file's type is not allowed!"))
                 return redirect(url_for('router.index', id=id, message="The file \'" + filename + "\' has been sent successfully!"))
                 
@@ -57,4 +56,13 @@ class PagesController:
     
     def getDocument(self, request, id: int):
         if request.method == 'GET':
+            # TODO code temporaire
+            from sqlalchemy import select
+            stmt = select(ArticleModel).where(ArticleModel.id == id)
+            from pdfextractor.common.base import session_factory
+            session = session_factory()
+            result = session.execute(stmt)
+            for user_obj in result.scalars():
+                print(f"{user_obj.content} {user_obj.datetime}")
+            # Fin du code temporaire
             return render_template('index.html', title="page", message=id)
