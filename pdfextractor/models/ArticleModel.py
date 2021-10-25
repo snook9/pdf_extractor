@@ -3,6 +3,7 @@
 # Tool for parsing and extracting PDF file content
 
 import pdftotext
+import json
 from datetime import datetime
 from pathlib import Path
 from flask import current_app as app
@@ -48,3 +49,15 @@ class ArticleModel(Base):
                     self._persist(''.join(data), output_filepath)
                     return self._internal_id
         return None
+
+class ArticleEncoder(json.JSONEncoder):
+    def default(self, o): 
+        if isinstance(o, ArticleModel):
+           # JSON object would be a dictionary.
+		        return {
+                "content" : o.content,
+                "datetime": o.datetime,
+            } 
+        else:
+            # Base class will raise the TypeError.
+            return super().default(o)

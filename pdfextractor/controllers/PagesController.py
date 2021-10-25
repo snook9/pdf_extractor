@@ -3,10 +3,13 @@
 # Tool for parsing and extracting PDF file content
 
 import os
-from flask import redirect, url_for, render_template
+import json
+from flask import Response, jsonify, redirect, url_for, render_template
 from flask import current_app as app
 from werkzeug.utils import secure_filename
-from pdfextractor.models.ArticleModel import ArticleModel
+from pdfextractor.models.ArticleModel import ArticleEncoder, ArticleModel
+from pdfextractor.common.base import session_factory
+from sqlalchemy import select
 
 class PagesController:
     def __init__(self: object):
@@ -56,13 +59,12 @@ class PagesController:
     
     def getDocument(self, request, id: int):
         if request.method == 'GET':
-            # TODO code temporaire
-            from sqlalchemy import select
-            stmt = select(ArticleModel).where(ArticleModel.id == id)
-            from pdfextractor.common.base import session_factory
+            stmt = select(ArticleModel).where(ArticleModel.id == id)         
             session = session_factory()
             result = session.execute(stmt)
+            json_data = None
             for user_obj in result.scalars():
-                print(f"{user_obj.content} {user_obj.datetime}")
+                #print(f"{user_obj.content} {user_obj.datetime}")
+                json_data = json.dumps(user_obj, cls=ArticleEncoder)
             # Fin du code temporaire
-            return render_template('index.html', title="page", message=id)
+            return Response(json_data, mimetype='application/json;charset=utf-8')
