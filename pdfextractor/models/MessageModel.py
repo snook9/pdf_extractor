@@ -7,15 +7,20 @@ import json
 class MessageModel():
     """Class for returning a generic message
     """
+    # ID of the inserted object
+    id=None
+    # Generic user message
     message=""
 
-    def __init__(self: object, message: str=None):
+    def __init__(self: object, message: str=None, id: int=None):
+        self.id = id
         self.message = message
 
 class MessageEncoder(json.JSONEncoder):
     def default(self, o): 
         if isinstance(o, MessageModel):
             return {
+                "id": o.id,
                 "message": o.message
                 } 
         else:

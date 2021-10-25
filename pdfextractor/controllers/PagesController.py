@@ -46,9 +46,10 @@ class PagesController:
             if file and PagesController._allowed_file(file.filename):
                 filename = secure_filename(file.filename)
                 file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-                if None == ArticleModel().persist(filename):
+                id = ArticleModel().persist(filename)
+                if None == id:
                     return Response(json.dumps(MessageModel("This file's type is not allowed!"), cls=MessageEncoder), mimetype='application/json;charset=utf-8')
-                return Response(json.dumps(MessageModel("The file \'" + filename + "\' has been sent successfully!"), cls=MessageEncoder), mimetype='application/json;charset=utf-8')
+                return Response(json.dumps(MessageModel("The file \'" + filename + "\' has been sent successfully!", id), cls=MessageEncoder), mimetype='application/json;charset=utf-8')
 
             return Response(json.dumps(MessageModel("This file's type is not allowed!"), cls=MessageEncoder), mimetype='application/json;charset=utf-8')
         else:
