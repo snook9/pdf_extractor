@@ -14,7 +14,7 @@ from sqlalchemy import select
 
 from pdfextractor.models.MessageModel import MessageModel
 
-class PagesController:
+class ApiController:
     def __init__(self: object):
         pass
 
@@ -54,7 +54,7 @@ class PagesController:
                 return Response(json.dumps(MessageModel("No selected file"), cls=MessageEncoder), mimetype='application/json;charset=utf-8')
 
             # If the file's type is allowed
-            if file and PagesController._allowed_file(file.filename):
+            if file and ApiController._allowed_file(file.filename):
                 # Check user input
                 filename = secure_filename(file.filename)
                 # Save the file in an upload folder
