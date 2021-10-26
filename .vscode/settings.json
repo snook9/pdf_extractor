@@ -3,5 +3,14 @@
         "."
     ],
     "python.testing.unittestEnabled": false,
-    "python.testing.pytestEnabled": true
+    "python.testing.pytestEnabled": true,
+    "sqltools.connections": [
+        {
+            "previewLimit": 50,
+            "driver": "SQLite",
+            "name": "PdfExtractor",
+            "database": "${workspaceFolder:PdfExtractor}/instance/pdfextractor.db"
+        }
+    ],
+    "sqltools.useNodeRuntime": true
 }

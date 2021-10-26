@@ -1,0 +1,11 @@
+stages:
+  - test
+
+test job:
+  stage: test
+  script:
+    - export PYTHONPATH=.
+    - export FLASK_APP=pdfextractor
+    - export FLASK_ENV=development
+    - pip install -e --quiet .
+    - pytest
