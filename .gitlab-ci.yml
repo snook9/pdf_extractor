@@ -14,7 +14,10 @@ stages:
 pytest:
   stage: Test
   script:
-  - export PYTHONPATH=.
+  - pwd
+  - ls -l
+  - export PYTHONPATH="$PYTHONPATH:."
+  - python -c "import sys;print(sys.path)"
   - export FLASK_APP=pdfextractor
   - export FLASK_ENV=development
   - pytest
