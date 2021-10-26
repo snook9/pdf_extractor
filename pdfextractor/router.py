@@ -22,8 +22,7 @@ def index():
     Returns:
         flask.Response: standard flask HTTP response.
     """
-    api_controller = ApiController()
-    return api_controller.index(request)
+    return ApiController.index(request)
 
 
 @bp.route("/documents/<int:doc_id>", methods=["GET"])
