@@ -1,0 +1,5 @@
+test:pytest:
+  image: python:3.8
+  script:
+    - pip install pytest --quiet
+    - pytest
