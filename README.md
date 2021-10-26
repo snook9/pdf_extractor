@@ -43,7 +43,7 @@ Or on Windows cmd::
 
 Install PdfExtractor:
 
-    $ pip install -e .
+    $ pip install -r requirements.txt
 
 ## Run
 

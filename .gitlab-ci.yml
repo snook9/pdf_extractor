@@ -1,12 +1,13 @@
 image: "python:3.8"
 
 before_script:
-  - python3 --version
-  - python3 -m venv venv
+  - sudo apt install build-essential libpoppler-cpp-dev pkg-config python3-dev
+  - python --version
+  - python -m venv venv
   - . venv/bin/activate
-  - pip3 install -e . --quiet
-  - pip3 install pytest
-  - pip3 install '.[test]'
+  - pip install -r requirements.txt
+  - pip install pytest
+  - pip install '.[test]'
 
 stages:
   - Test
@@ -17,7 +18,7 @@ pytest:
   - pwd
   - ls -l
   - export PYTHONPATH="$PYTHONPATH:."
-  - python3 -c "import sys;print(sys.path)"
+  - python -c "import sys;print(sys.path)"
   - export FLASK_APP=pdfextractor
   - export FLASK_ENV=development
   - pytest
