@@ -1,7 +1,7 @@
 image: "python:3.8"
 
 before_script:
-  - apt install build-essential libpoppler-cpp-dev pkg-config python3-dev
+  - apt install pkg-config
   - python --version
   - python -m venv venv
   - . venv/bin/activate
