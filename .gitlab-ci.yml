@@ -4,6 +4,7 @@ before_script:
   - python --version
   - pip install -e . --quiet
   - pip install pytest
+  - pip install '.[test]'
 
 stages:
   - Test
