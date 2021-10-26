@@ -27,7 +27,7 @@ def index():
 
 
 @bp.route("/documents/<int:doc_id>", methods=["GET"])
-def get_document(doc_id):
+def getDocument(doc_id):
     """Information about a document.
     GET method returns metadata about the document, specified by the ID parameter.
         See README.md for response format.
@@ -35,11 +35,11 @@ def get_document(doc_id):
     Returns:
         flask.Response: standard flask HTTP response.
     """
-    return ApiController.get_document(request, doc_id)
+    return ApiController.getDocument(request, doc_id)
 
 
 @bp.route("/text/<int:doc_id>", methods=["GET"])
-def get_text(doc_id):
+def getText(doc_id):
     """Content of a document.
     GET method returns the content of a document, specified by the ID parameter.
         See README.md for response format.
@@ -47,4 +47,4 @@ def get_text(doc_id):
     Returns:
         flask.Response: standard flask HTTP response.
     """
-    return ApiController.get_text(request, doc_id)
+    return ApiController.getText(request, doc_id)

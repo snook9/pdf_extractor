@@ -11,12 +11,12 @@ class MessageModel:
     """Class for returning a generic message"""
 
     # ID of the inserted object
-    id = None
+    object_id = None
     # Generic user message
     message = ""
 
-    def __init__(self: object, message: str = None, id: int = None):
-        self.id = id
+    def __init__(self: object, message: str = None, object_id: int = None):
+        self.object_id = object_id
         self.message = message
 
 
@@ -25,7 +25,7 @@ class MessageEncoder(json.JSONEncoder):
 
     def default(self, o):
         if isinstance(o, MessageModel):
-            return {"id": o.id, "message": o.message}
-        else:
-            # Base class will raise the TypeError.
-            return super().default(o)
+            return {"id": o.object_id, "message": o.message}
+
+        # Base class will raise the TypeError.
+        return super().default(o)

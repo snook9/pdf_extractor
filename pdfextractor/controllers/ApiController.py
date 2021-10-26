@@ -114,7 +114,7 @@ class ApiController:
         return render_template("index.html", title="page", message=message)
 
     @staticmethod
-    def get_document(request, doc_id: int):
+    def getDocument(request, doc_id: int):
         """Information about a document.
         GET method returns metadata about the document, specified by the ID parameter.
             See README.md for response format.
@@ -159,7 +159,7 @@ class ApiController:
         )
 
     @staticmethod
-    def get_text(request, doc_id: int):
+    def getText(request, doc_id: int):
         """Content of a document.
         GET method returns the content of a document, specified by the ID parameter.
             See README.md for response format.
