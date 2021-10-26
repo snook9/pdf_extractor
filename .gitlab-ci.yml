@@ -7,6 +7,5 @@ test job:
     - export PYTHONPATH=.
     - export FLASK_APP=pdfextractor
     - export FLASK_ENV=development
-    - apt-get update -qy
-    - pip install -e .
+    - pip install -e --quiet .
     - pytest
