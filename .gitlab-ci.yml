@@ -1,10 +1,7 @@
 image: "python:3.8"
 
 before_script:
-  - apt install pkg-config
   - python --version
-  - python -m venv venv
-  - . venv/bin/activate
   - pip install -r requirements.txt
   - pip install pytest
   - pip install '.[test]'
