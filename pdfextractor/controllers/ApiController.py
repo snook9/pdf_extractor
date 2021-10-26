@@ -81,7 +81,7 @@ class ApiController:
             return render_template('index.html', title="page", message=message)
     
     def getDocument(self, request, id: int):
-        """Index of the API.
+        """Information about a document.
         GET method returns metadata about the document, specified by the ID parameter.
             See README.md for response format.
 
@@ -95,11 +95,49 @@ class ApiController:
             session = session_factory()
             # Executing the query
             result = session.execute(stmt)
-            json_data = None
             # Parsing the result
             for user_obj in result.scalars():
+                # We build the JSON response
+                data = {}
+                data['id'] = user_obj.id
+                data['status'] = "SUCCESS"
+                data['uploaded_datetime'] = user_obj.datetime
+                data['author'] = user_obj.author
+                data['creator'] = user_obj.creator
+                data['producer'] = user_obj.producer
+                data['subject'] = user_obj.subject
+                data['title'] = user_obj.title
+                data['number_of_pages'] = user_obj.number_of_pages
+                data['raw_info'] = user_obj.raw_info
                 # Converting the object to JSON string
-                json_data = json.dumps(user_obj, cls=ArticleEncoder)
+                json_data = json.dumps(data)
+                # We leave the for and return the first element (cause "normaly", there is only one row)
+                return Response(json_data, mimetype='application/json;charset=utf-8')
+            # Else, no document found
+            return Response(json.dumps(MessageModel("No document found"), cls=MessageEncoder), mimetype='application/json;charset=utf-8')
+
+    def getText(self, request, id: int):
+        """Content of a document.
+        GET method returns the content of a document, specified by the ID parameter.
+            See README.md for response format.
+
+        Returns:
+            flask.Response: standard flask HTTP response.
+        """
+        if request.method == 'GET':
+            # Preparing the query for the ID
+            stmt = select(ArticleModel).where(ArticleModel.id == id)
+            # Retreive the session
+            session = session_factory()
+            # Executing the query
+            result = session.execute(stmt)
+            # Parsing the result
+            for user_obj in result.scalars():
+                # We build the JSON response
+                data = {}
+                data['content'] = user_obj.content
+                # Converting the object to JSON string
+                json_data = json.dumps(data)
                 # We leave the for and return the first element (cause "normaly", there is only one row)
                 return Response(json_data, mimetype='application/json;charset=utf-8')
             # Else, no document found
