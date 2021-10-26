@@ -5,11 +5,12 @@
 import pytest
 from pdfextractor import create_app
 
+
 @pytest.fixture
 def client():
-    app = create_app({'TESTING': True})
+    app = create_app({"TESTING": True})
 
     with app.test_client() as client:
-        #with app.app_context():
-            #We can init some code here
+        # with app.app_context():
+        # We can init some code here
         yield client
