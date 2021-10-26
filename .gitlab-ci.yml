@@ -1,5 +1,12 @@
-test:pytest:
-  image: python:3.8
+stages:
+  - test
+
+test job:
+  stage: test
   script:
-    - pip install pytest --quiet
+    - export PYTHONPATH=.
+    - export FLASK_APP=pdfextractor
+    - export FLASK_ENV=development
+    - apt-get update -qy
+    - pip install -e .
     - pytest
