@@ -1,11 +1,24 @@
-stages:
-  - test
+image: "python:3.8"
 
-test job:
-  stage: test
+before_script:
+  - python --version
+  - python -m venv venv
+  - . venv/bin/activate
+  - python -m pip install --upgrade pip
+  - pip install -r requirements.txt
+  - pip install pytest
+  - pip install '.[test]'
+
+stages:
+  - Test
+
+pytest:
+  stage: Test
   script:
-    - export PYTHONPATH=.
-    - export FLASK_APP=pdfextractor
-    - export FLASK_ENV=development
-    - pip install -e --quiet .
-    - pytest
+  - pwd
+  - ls -l
+  - export PYTHONPATH="$PYTHONPATH:."
+  - python -c "import sys;print(sys.path)"
+  - export FLASK_APP=pdfextractor
+  - export FLASK_ENV=development
+  - pytest

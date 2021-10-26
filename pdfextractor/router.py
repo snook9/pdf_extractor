@@ -4,7 +4,7 @@
 
 from flask import Blueprint, request
 
-from pdfextractor.controllers.PagesController import PagesController
+from pdfextractor.controllers.ApiController import ApiController
 
 bp = Blueprint('router', __name__, template_folder='templates')
 
@@ -19,17 +19,29 @@ def index():
     Returns:
         flask.Response: standard flask HTTP response.
     """
-    pagesController = PagesController()
-    return pagesController.index(request)
+    api_controller = ApiController()
+    return api_controller.index(request)
 
 @bp.route('/documents/<int:id>', methods=['GET'])
 def getDocument(id):
-    """Index of the API.
+    """Information about a document.
     GET method returns metadata about the document, specified by the ID parameter.
         See README.md for response format.
 
     Returns:
         flask.Response: standard flask HTTP response.
     """
-    pagesController = PagesController()
-    return pagesController.getDocument(request, id)
+    api_controller = ApiController()
+    return api_controller.getDocument(request, id)
+
+@bp.route('/text/<int:id>', methods=['GET'])
+def getText(id):
+    """Content of a document.
+    GET method returns the content of a document, specified by the ID parameter.
+        See README.md for response format.
+
+    Returns:
+        flask.Response: standard flask HTTP response.
+    """
+    api_controller = ApiController()
+    return api_controller.getText(request, id)

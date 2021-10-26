@@ -17,7 +17,7 @@ class MessageModel():
         self.message = message
 
 class MessageEncoder(json.JSONEncoder):
-    """Class for converting object to JSON string
+    """Class for converting full object to JSON string
     """
     def default(self, o): 
         if isinstance(o, MessageModel):
