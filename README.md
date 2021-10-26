@@ -4,6 +4,33 @@ Tool for parsing and extracting PDF file content.
 
 ## Install
 
+### OS Dependencies
+
+These instructions assume you're using Python 3 on a recent OS. Package names may differ for Python 2 or for an older OS.
+
+#### Debian, Ubuntu, and friends
+
+    sudo apt install build-essential libpoppler-cpp-dev pkg-config python3-dev
+
+#### Fedora, Red Hat, and friends
+
+    sudo yum install gcc-c++ pkgconfig poppler-cpp-devel python3-devel
+
+#### macOS
+    
+    brew install pkg-config poppler python
+
+#### Windows
+
+Currently tested only when using conda:
+
+- Install the Microsoft Visual C++ Build Tools
+- Install poppler through conda:
+
+    conda install -c conda-forge poppler
+
+### PdfExtractor
+
 Create a virtualenv and activate it:
 
     $ python3 -m venv venv
