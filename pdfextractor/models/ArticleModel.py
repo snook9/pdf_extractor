@@ -1,6 +1,8 @@
-# Name: PdfExporter
-# Authors: Jonathan CASSAING
-# Tool for parsing and extracting PDF file content
+"""
+Name: PdfExporter
+Authors: Jonathan CASSAING
+Tool for parsing and extracting PDF file content
+"""
 
 # pdftotext is used to extract PDF content (text body)
 import pdftotext

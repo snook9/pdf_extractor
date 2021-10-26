@@ -1,20 +1,23 @@
-# Name: PdfExporter
-# Authors: Jonathan CASSAING
-# Tool for parsing and extracting PDF file content
+"""
+Name: PdfExporter
+Authors: Jonathan CASSAING
+Tool for parsing and extracting PDF file content
+"""
 
 import os
 import json
 from flask import Response, render_template
 from flask import current_app as app
 from werkzeug.utils import secure_filename
-from pdfextractor.models.ArticleModel import ArticleEncoder, ArticleModel
+from sqlalchemy import select
+from pdfextractor.models.ArticleModel import ArticleModel
 from pdfextractor.models.MessageModel import MessageEncoder, MessageModel
 from pdfextractor.common.base import session_factory
-from sqlalchemy import select
-
-from pdfextractor.models.MessageModel import MessageModel
 
 class ApiController:
+    """ApiController of the PdfExtractor software
+    """
+
     def __init__(self: object):
         pass
 
@@ -28,9 +31,11 @@ class ApiController:
         Returns:
             bool: True if the extension of the filename is allowed, otherwise - returns False.
         """
-        return '.' in filename and filename.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']
+        return '.' in filename and filename.rsplit('.', 1)[1].lower() \
+            in app.config['ALLOWED_EXTENSIONS']
 
-    def index(self, request):
+    @staticmethod
+    def index(request):
         """Index of the API.
         GET method returns an HTML upload form.
         POST method can be used to upload a PDF file.
@@ -60,27 +65,28 @@ class ApiController:
                 # Save the file in an upload folder
                 file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
                 # Persist the file in the database
-                id = ArticleModel().persist(filename)
+                doc_id = ArticleModel().persist(filename)
                 # If failed
-                if None == id:
+                if None is doc_id:
                     # Returns the appropriate error
                     return Response(json.dumps(MessageModel("This file's type is not allowed!"), cls=MessageEncoder), mimetype='application/json;charset=utf-8')
                 # Else, returning the ID of the object in the database
-                return Response(json.dumps(MessageModel("The file \'" + filename + "\' has been sent successfully!", id), cls=MessageEncoder), mimetype='application/json;charset=utf-8')
+                return Response(json.dumps(MessageModel("The file \'" + filename + "\' has been sent successfully!", doc_id), cls=MessageEncoder), mimetype='application/json;charset=utf-8')
 
             # Else, the file's type is not allowed
             return Response(json.dumps(MessageModel("This file's type is not allowed!"), cls=MessageEncoder), mimetype='application/json;charset=utf-8')
-        else:
-            # Check if the application returns a message
-            # NO MORE USED CURRENTLY
-            message = request.args.get('message')
-            if None == message:
-                message = ''
 
-            # Generate an index HTML page with an outstanding look & feel
-            return render_template('index.html', title="page", message=message)
+        # Check if the application returns a message
+        # NO MORE USED CURRENTLY
+        message = request.args.get('message')
+        if None is message:
+            message = ''
+
+        # Generate an index HTML page with an outstanding look & feel
+        return render_template('index.html', title="page", message=message)
     
-    def getDocument(self, request, id: int):
+    @staticmethod
+    def get_document(request, doc_id: int):
         """Information about a document.
         GET method returns metadata about the document, specified by the ID parameter.
             See README.md for response format.
@@ -90,7 +96,7 @@ class ApiController:
         """
         if request.method == 'GET':
             # Preparing the query for the ID
-            stmt = select(ArticleModel).where(ArticleModel.id == id)
+            stmt = select(ArticleModel).where(ArticleModel.id == doc_id)
             # Retreive the session
             session = session_factory()
             # Executing the query
@@ -111,12 +117,19 @@ class ApiController:
                 data['raw_info'] = user_obj.raw_info
                 # Converting the object to JSON string
                 json_data = json.dumps(data)
-                # We leave the for and return the first element (cause "normaly", there is only one row)
+                # We leave the for and return the first element
+                # (cause "normaly", there is only one row)
                 return Response(json_data, mimetype='application/json;charset=utf-8')
             # Else, no document found
-            return Response(json.dumps(MessageModel("No document found"), cls=MessageEncoder), mimetype='application/json;charset=utf-8')
+            return Response(json.dumps(MessageModel("No document found"),
+                                    cls=MessageEncoder),
+                                    mimetype='application/json;charset=utf-8')
+        return Response(json.dumps(MessageModel("Incorrect HTTP method"),
+                        cls=MessageEncoder), 
+                        mimetype='application/json;charset=utf-8')
 
-    def getText(self, request, id: int):
+    @staticmethod
+    def get_text(request, doc_id: int):
         """Content of a document.
         GET method returns the content of a document, specified by the ID parameter.
             See README.md for response format.
@@ -126,7 +139,7 @@ class ApiController:
         """
         if request.method == 'GET':
             # Preparing the query for the ID
-            stmt = select(ArticleModel).where(ArticleModel.id == id)
+            stmt = select(ArticleModel).where(ArticleModel.id == doc_id)
             # Retreive the session
             session = session_factory()
             # Executing the query
@@ -138,7 +151,13 @@ class ApiController:
                 data['content'] = user_obj.content
                 # Converting the object to JSON string
                 json_data = json.dumps(data)
-                # We leave the for and return the first element (cause "normaly", there is only one row)
+                # We leave the for and return the first element
+                # (cause "normaly", there is only one row)
                 return Response(json_data, mimetype='application/json;charset=utf-8')
             # Else, no document found
-            return Response(json.dumps(MessageModel("No document found"), cls=MessageEncoder), mimetype='application/json;charset=utf-8')
+            return Response(json.dumps(MessageModel("No document found"), 
+                            cls=MessageEncoder), 
+                            mimetype='application/json;charset=utf-8')
+        return Response(json.dumps(MessageModel("Incorrect HTTP method"), 
+                        cls=MessageEncoder), 
+                        mimetype='application/json;charset=utf-8')

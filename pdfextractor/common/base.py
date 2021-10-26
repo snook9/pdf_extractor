@@ -1,3 +1,9 @@
+"""
+Name: PdfExporter
+Authors: Jonathan CASSAING
+Tool for parsing and extracting PDF file content
+"""
+
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker

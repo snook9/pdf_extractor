@@ -1,12 +1,15 @@
-# Name: PdfExporter
-# Authors: Jonathan CASSAING
-# Tool for parsing and extracting PDF file content
+"""
+Name: PdfExporter
+Authors: Jonathan CASSAING
+Tool for parsing and extracting PDF file content
+"""
 
 from flask import Flask
 from pdfextractor import router
 
 def create_app(test_config=None):
-    # create and configure the app with the factory pattern
+    """ Create and configure the flask app with the factory pattern
+    """
     app = Flask(__name__, instance_relative_config=True)
 
     if test_config is None:
