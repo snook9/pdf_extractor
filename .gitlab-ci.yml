@@ -2,6 +2,8 @@ image: "python:3.8"
 
 before_script:
   - python --version
+  - python -m venv venv
+  - . venv/bin/activate
   - pip install -e . --quiet
   - pip install pytest
   - pip install '.[test]'
