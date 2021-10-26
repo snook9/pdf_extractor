@@ -1,12 +1,12 @@
 image: "python:3.8"
 
 before_script:
-  - python --version
-  - python -m venv venv
+  - python3 --version
+  - python3 -m venv venv
   - . venv/bin/activate
-  - pip install -e . --quiet
-  - pip install pytest
-  - pip install '.[test]'
+  - pip3 install -e . --quiet
+  - pip3 install pytest
+  - pip3 install '.[test]'
 
 stages:
   - Test
@@ -17,7 +17,7 @@ pytest:
   - pwd
   - ls -l
   - export PYTHONPATH="$PYTHONPATH:."
-  - python -c "import sys;print(sys.path)"
+  - python3 -c "import sys;print(sys.path)"
   - export FLASK_APP=pdfextractor
   - export FLASK_ENV=development
   - pytest
