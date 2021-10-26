@@ -8,10 +8,11 @@ from flask import Blueprint, request
 
 from pdfextractor.controllers.ApiController import ApiController
 
-bp = Blueprint('router', __name__, template_folder='templates')
+bp = Blueprint("router", __name__, template_folder="templates")
 
-@bp.route('/', methods=['GET', 'POST'])
-@bp.route('/documents', methods=['GET', 'POST'])
+
+@bp.route("/", methods=["GET", "POST"])
+@bp.route("/documents", methods=["GET", "POST"])
 def index():
     """Index of the API.
     GET method returns an HTML upload form.
@@ -24,7 +25,8 @@ def index():
     api_controller = ApiController()
     return api_controller.index(request)
 
-@bp.route('/documents/<int:doc_id>', methods=['GET'])
+
+@bp.route("/documents/<int:doc_id>", methods=["GET"])
 def get_document(doc_id):
     """Information about a document.
     GET method returns metadata about the document, specified by the ID parameter.
@@ -35,7 +37,8 @@ def get_document(doc_id):
     """
     return ApiController.get_document(request, doc_id)
 
-@bp.route('/text/<int:doc_id>', methods=['GET'])
+
+@bp.route("/text/<int:doc_id>", methods=["GET"])
 def get_text(doc_id):
     """Content of a document.
     GET method returns the content of a document, specified by the ID parameter.
