@@ -14,6 +14,7 @@ stages:
 pytest:
   stage: Test
   script:
+  - . venv/bin/activate
   - export PYTHONPATH=.
   - export FLASK_APP=pdfextractor
   - export FLASK_ENV=development
