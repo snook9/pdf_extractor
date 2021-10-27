@@ -10,8 +10,8 @@ from flask import Response, render_template
 from flask import current_app as app
 from werkzeug.utils import secure_filename
 from sqlalchemy import select
-from pdfextractor.models.ArticleModel import ArticleModel
-from pdfextractor.models.MessageModel import MessageEncoder, MessageModel
+from pdfextractor.models.article_model import ArticleModel
+from pdfextractor.models.message_model import MessageEncoder, MessageModel
 from pdfextractor.common.base import session_factory
 
 
@@ -114,7 +114,7 @@ class ApiController:
         return render_template("index.html", title="page", message=message)
 
     @staticmethod
-    def getDocument(request, doc_id: int):
+    def get_document(request, doc_id: int):
         """Information about a document.
         GET method returns metadata about the document, specified by the ID parameter.
             See README.md for response format.
@@ -159,7 +159,7 @@ class ApiController:
         )
 
     @staticmethod
-    def getText(request, doc_id: int):
+    def get_text(request, doc_id: int):
         """Content of a document.
         GET method returns the content of a document, specified by the ID parameter.
             See README.md for response format.

@@ -3,7 +3,7 @@
 # Tool for parsing and extracting PDF file content
 
 import unittest
-import pdfextractor.controllers.ApiController as ApiController
+import pdfextractor.controllers.api_controller as ApiController
 from pdfextractor import create_app
 
 

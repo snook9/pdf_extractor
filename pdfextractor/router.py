@@ -6,7 +6,7 @@ Tool for parsing and extracting PDF file content
 
 from flask import Blueprint, request
 
-from pdfextractor.controllers.ApiController import ApiController
+from pdfextractor.controllers.api_controller import ApiController
 
 bp = Blueprint("router", __name__, template_folder="templates")
 
@@ -26,7 +26,7 @@ def index():
 
 
 @bp.route("/documents/<int:doc_id>", methods=["GET"])
-def getDocument(doc_id):
+def get_document(doc_id):
     """Information about a document.
     GET method returns metadata about the document, specified by the ID parameter.
         See README.md for response format.
@@ -34,11 +34,11 @@ def getDocument(doc_id):
     Returns:
         flask.Response: standard flask HTTP response.
     """
-    return ApiController.getDocument(request, doc_id)
+    return ApiController.get_document(request, doc_id)
 
 
 @bp.route("/text/<int:doc_id>", methods=["GET"])
-def getText(doc_id):
+def get_text(doc_id):
     """Content of a document.
     GET method returns the content of a document, specified by the ID parameter.
         See README.md for response format.
@@ -46,4 +46,4 @@ def getText(doc_id):
     Returns:
         flask.Response: standard flask HTTP response.
     """
-    return ApiController.getText(request, doc_id)
+    return ApiController.get_text(request, doc_id)

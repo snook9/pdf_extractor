@@ -160,7 +160,7 @@ class ArticleModel(Base):
                 subject = info.subject
                 title = info.title
 
-                with open(output_filepath, "w") as file:
+                with open(output_filepath, "w", encoding="utf-8") as file:
                     # Saving content to a text file
                     file.write("\n".join(data))
                     # Saving content AND meta data to the database

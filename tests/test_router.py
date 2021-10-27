@@ -17,7 +17,7 @@ def test_index(client):
     response = client.post("/", data=data)
     assert response.status == "200 OK"
 
-def test_getDocument(client):
+def test_get_document(client):
     """Test the /documents/<id> route
 
     Important: This test can pass if the first line of the database is not empty!
