@@ -27,11 +27,12 @@ class ArticleModel(Base):
     # Table name in the database
     __tablename__ = "file"
     # Internal ID is used to store the real ID (in database) after the session close
-    _internal_id = None
+    internal_id = None
     # ID primary key in the database
+    # Nota: this id is wiped after a session.close()
     id = Column("id", Integer, primary_key=True)
-    # Datetime column in the database
-    datetime = Column("datetime", String(255))
+    # Date and time column in the database
+    date = Column("date", String(255))
     # Author PDF meta data
     author = Column("author", String(255))
     # Creator PDF meta data
@@ -51,7 +52,7 @@ class ArticleModel(Base):
 
     def __init__(
         self: object,
-        datetime: str = None,
+        date: str = None,
         author: str = None,
         creator: str = None,
         producer: str = None,
@@ -64,7 +65,7 @@ class ArticleModel(Base):
         """Initialize the object
 
         Args:
-            datetime (str, optional): to force datetime. Defaults to None.
+            date (str, optional): to force date and time. Defaults to None.
             author (str, optional): to force author. Defaults to None.
             creator (str, optional): to force creator. Defaults to None.
             producer (str, optional): to force producer. Defaults to None.
@@ -74,7 +75,7 @@ class ArticleModel(Base):
             raw_info (str, optional): to force raw_info. Defaults to None.
             content (str, optional): to force content. Defaults to None.
         """
-        self.datetime = str(datetime)
+        self.date = str(date)
         self.author = str(author)
         self.creator = str(creator)
         self.producer = str(producer)
@@ -92,7 +93,7 @@ class ArticleModel(Base):
 
     def _persist(
         self,
-        datetime: str,
+        date: str,
         author: str,
         creator: str,
         producer: str,
@@ -105,7 +106,7 @@ class ArticleModel(Base):
         """Private method to persist the object in the database
 
         Args:
-            datetime (str): datetime field
+            date (str): date field
             author (str): author field
             creator (str): creator field
             producer (str): producer field
@@ -116,7 +117,7 @@ class ArticleModel(Base):
             content (str): content field
         """
         session = session_factory()
-        self.datetime = str(datetime)
+        self.date = str(date)
         self.author = str(author)
         self.creator = str(creator)
         self.producer = str(producer)
@@ -128,7 +129,7 @@ class ArticleModel(Base):
         session.add(self)
         session.commit()
         # We save the ID cause it will wiped after the session.close()
-        self._internal_id = self.id
+        self.internal_id = self.id
         session.close()
 
     def persist(self, filename: str):
@@ -160,7 +161,7 @@ class ArticleModel(Base):
                 subject = info.subject
                 title = info.title
 
-                with open(output_filepath, "w") as file:
+                with open(output_filepath, "w", encoding="utf-8") as file:
                     # Saving content to a text file
                     file.write("\n".join(data))
                     # Saving content AND meta data to the database
@@ -175,7 +176,7 @@ class ArticleModel(Base):
                         info,
                         "".join(data),
                     )
-                    return self._internal_id
+                    return self.internal_id
         return None
 
 
@@ -188,11 +189,11 @@ class ArticleEncoder(json.JSONEncoder):
             if None is doc_id:
                 # If None, the object was created after a INSERT query,
                 # so, the internal_id is the table id
-                doc_id = o._internal_id
+                doc_id = o.internal_id
 
             return {
                 "id": doc_id,
-                "datetime": o.datetime,
+                "date": o.date,
                 "author": o.author,
                 "creator": o.creator,
                 "producer": o.producer,

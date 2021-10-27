@@ -10,8 +10,8 @@ from flask import Response, render_template
 from flask import current_app as app
 from werkzeug.utils import secure_filename
 from sqlalchemy import select
-from pdfextractor.models.ArticleModel import ArticleModel
-from pdfextractor.models.MessageModel import MessageEncoder, MessageModel
+from pdfextractor.models.article_model import ArticleModel
+from pdfextractor.models.message_model import MessageEncoder, MessageModel
 from pdfextractor.common.base import session_factory
 
 
@@ -53,7 +53,7 @@ class ApiController:
                 return Response(
                     json.dumps(MessageModel("No file part"), cls=MessageEncoder),
                     mimetype="application/json;charset=utf-8",
-                )
+                ), 400
 
             # Else, we get the file
             file = request.files["file"]
@@ -64,7 +64,7 @@ class ApiController:
                 return Response(
                     json.dumps(MessageModel("No selected file"), cls=MessageEncoder),
                     mimetype="application/json;charset=utf-8",
-                )
+                ), 400
 
             # If the file's type is allowed
             if file and ApiController._allowed_file(file.filename):
@@ -83,7 +83,7 @@ class ApiController:
                             cls=MessageEncoder,
                         ),
                         mimetype="application/json;charset=utf-8",
-                    )
+                    ), 400
                 # Else, returning the ID of the object in the database
                 return Response(
                     json.dumps(
@@ -94,7 +94,7 @@ class ApiController:
                         cls=MessageEncoder,
                     ),
                     mimetype="application/json;charset=utf-8",
-                )
+                ), 201
 
             # Else, the file's type is not allowed
             return Response(
@@ -102,7 +102,7 @@ class ApiController:
                     MessageModel("This file's type is not allowed!"), cls=MessageEncoder
                 ),
                 mimetype="application/json;charset=utf-8",
-            )
+            ), 400
 
         # Check if the application returns a message
         # NO MORE USED CURRENTLY
@@ -114,7 +114,7 @@ class ApiController:
         return render_template("index.html", title="page", message=message)
 
     @staticmethod
-    def getDocument(request, doc_id: int):
+    def get_document(request, doc_id: int):
         """Information about a document.
         GET method returns metadata about the document, specified by the ID parameter.
             See README.md for response format.
@@ -135,7 +135,7 @@ class ApiController:
                 data = {}
                 data["id"] = user_obj.id
                 data["status"] = "SUCCESS"
-                data["uploaded_datetime"] = user_obj.datetime
+                data["uploaded_date"] = user_obj.date
                 data["author"] = user_obj.author
                 data["creator"] = user_obj.creator
                 data["producer"] = user_obj.producer
@@ -152,14 +152,14 @@ class ApiController:
             return Response(
                 json.dumps(MessageModel("No document found"), cls=MessageEncoder),
                 mimetype="application/json;charset=utf-8",
-            )
+            ), 404
         return Response(
             json.dumps(MessageModel("Incorrect HTTP method"), cls=MessageEncoder),
             mimetype="application/json;charset=utf-8",
-        )
+        ), 405
 
     @staticmethod
-    def getText(request, doc_id: int):
+    def get_text(request, doc_id: int):
         """Content of a document.
         GET method returns the content of a document, specified by the ID parameter.
             See README.md for response format.
@@ -188,8 +188,8 @@ class ApiController:
             return Response(
                 json.dumps(MessageModel("No document found"), cls=MessageEncoder),
                 mimetype="application/json;charset=utf-8",
-            )
+            ), 404
         return Response(
             json.dumps(MessageModel("Incorrect HTTP method"), cls=MessageEncoder),
             mimetype="application/json;charset=utf-8",
-        )
+        ), 405
