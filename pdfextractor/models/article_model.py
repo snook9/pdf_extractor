@@ -1,59 +1,66 @@
-# Name: PdfExporter
-# Authors: Jonathan CASSAING
-# Tool for parsing and extracting PDF file content
+"""
+Name: PdfExporter
+Authors: Jonathan CASSAING
+Tool for parsing and extracting PDF file content
+"""
 
+from datetime import datetime
+from pathlib import Path
+import json
 # pdftotext is used to extract PDF content (text body)
 import pdftotext
 # PyPDF2 is used to extract PDF meta data
 from PyPDF2 import PdfFileReader
-import json
-from datetime import datetime
-from pathlib import Path
 from flask import current_app as app
 from sqlalchemy import Column, Integer, String
 from pdfextractor.common.base import Base
 from pdfextractor.common.base import session_factory
 
+
 class ArticleModel(Base):
     """Class for representing Article entity and his Data Access Object
 
     This class can be used to persist the object in the database AND
-    to save the Article in a basic text file. 
+    to save the Article in a basic text file.
     """
-    # Table name in the database
-    __tablename__ = 'file'
-    # ID primary key in the database
-    id=Column('id', Integer, primary_key=True)
-    # Datetime column in the database
-    datetime=Column('datetime', String(255))
-    # Author PDF meta data
-    author=Column('author', String(255))
-    # Creator PDF meta data
-    creator=Column('creator', String(255))
-    # Producer PDF meta data
-    producer=Column('producer', String(255))
-    # Subjet PDF meta data
-    subject=Column('subject', String(255))
-    # Title PDF meta data
-    title=Column('title', String(255))
-    # Pages count PDF meta data
-    number_of_pages=Column('number_of_pages', Integer)
-    # Raw informations PDF meta data
-    raw_info=Column('raw_info', String())
-    # Content column in the database
-    content=Column('content', String)
-    # Internal ID is used to store the real ID (in database) after the session close
-    _internal_id=None
 
-    def __init__(self: object, datetime: str=None, 
-                author: str=None,
-                creator: str=None,
-                producer: str=None,
-                subject: str=None,
-                title: str=None,
-                number_of_pages: int=None,
-                raw_info: str=None,
-                content: str=None):
+    # Table name in the database
+    __tablename__ = "file"
+    # Internal ID is used to store the real ID (in database) after the session close
+    _internal_id = None
+    # ID primary key in the database
+    id = Column("id", Integer, primary_key=True)
+    # Datetime column in the database
+    datetime = Column("datetime", String(255))
+    # Author PDF meta data
+    author = Column("author", String(255))
+    # Creator PDF meta data
+    creator = Column("creator", String(255))
+    # Producer PDF meta data
+    producer = Column("producer", String(255))
+    # Subjet PDF meta data
+    subject = Column("subject", String(255))
+    # Title PDF meta data
+    title = Column("title", String(255))
+    # Pages count PDF meta data
+    number_of_pages = Column("number_of_pages", Integer)
+    # Raw informations PDF meta data
+    raw_info = Column("raw_info", String())
+    # Content column in the database
+    content = Column("content", String)
+
+    def __init__(
+        self: object,
+        datetime: str = None,
+        author: str = None,
+        creator: str = None,
+        producer: str = None,
+        subject: str = None,
+        title: str = None,
+        number_of_pages: int = None,
+        raw_info: str = None,
+        content: str = None,
+    ):
         """Initialize the object
 
         Args:
@@ -78,20 +85,23 @@ class ArticleModel(Base):
         self.content = str(content)
 
         # Configure the folder where text files will be saved
-        self._output_folder = Path(app.config['DATA_FOLDER'])
-        if False == self._output_folder.exists():
+        self._output_folder = Path(app.config["DATA_FOLDER"])
+        if False is self._output_folder.exists():
             # If the folder doesn't exist, we create it
             self._output_folder.mkdir()
 
-    def _persist(self, datetime: str, 
-                author: str,
-                creator: str,
-                producer: str,
-                subject: str,
-                title: str,
-                number_of_pages: int,
-                raw_info: str,
-                content: str):
+    def _persist(
+        self,
+        datetime: str,
+        author: str,
+        creator: str,
+        producer: str,
+        subject: str,
+        title: str,
+        number_of_pages: int,
+        raw_info: str,
+        content: str,
+    ):
         """Private method to persist the object in the database
 
         Args:
@@ -128,19 +138,20 @@ class ArticleModel(Base):
             filename (str): filename of the target file
 
         Returns:
-            int: ID of the persisted object in the database, otherwise - returns None if the file's type is not supported.
+            int: ID of the persisted object in the database,
+            otherwise - returns None if the file's type is not supported.
         """
         today = datetime.today().strftime("%Y-%m-%d-%H-%M-%S.%f")
         # Create a unique filename
-        output_filepath = self._output_folder / Path('file_' + today + '.txt')
+        output_filepath = self._output_folder / Path("file_" + today + ".txt")
 
-        if "pdf" == filename.rsplit('.', 1)[1].lower():
-            with open(filename, "rb") as f:
+        if filename.rsplit(".", 1)[1].lower() == "pdf":
+            with open(filename, "rb") as file:
                 # Extracting the text (content)
-                data = pdftotext.PDF(f)
+                data = pdftotext.PDF(file)
 
                 # Extracting meta data
-                pdf = PdfFileReader(f)
+                pdf = PdfFileReader(file)
                 info = pdf.getDocumentInfo()
                 number_of_pages = pdf.getNumPages()
                 author = info.author
@@ -149,34 +160,38 @@ class ArticleModel(Base):
                 subject = info.subject
                 title = info.title
 
-                with open(output_filepath, 'w') as f:
+                with open(output_filepath, "w", encoding="utf-8") as file:
                     # Saving content to a text file
-                    f.write('\n'.join(data))
+                    file.write("\n".join(data))
                     # Saving content AND meta data to the database
-                    self._persist(today,
-                                author,
-                                creator,
-                                producer,
-                                subject,
-                                title,
-                                number_of_pages,
-                                info,
-                                ''.join(data))
+                    self._persist(
+                        today,
+                        author,
+                        creator,
+                        producer,
+                        subject,
+                        title,
+                        number_of_pages,
+                        info,
+                        "".join(data),
+                    )
                     return self._internal_id
         return None
 
+
 class ArticleEncoder(json.JSONEncoder):
-    """Class for converting full object to JSON string
-    """
-    def default(self, o): 
+    """Class for converting full object to JSON string"""
+
+    def default(self, o):
         if isinstance(o, ArticleModel):
-            id = o.id
-            if None == id:
-                # If None, the object was created after a INSERT query, so, the internal_id is the table id
-                id = o._internal_id
-            
+            doc_id = o.id
+            if None is doc_id:
+                # If None, the object was created after a INSERT query,
+                # so, the internal_id is the table id
+                doc_id = o._internal_id
+
             return {
-                "id": id,
+                "id": doc_id,
                 "datetime": o.datetime,
                 "author": o.author,
                 "creator": o.creator,
@@ -185,8 +200,7 @@ class ArticleEncoder(json.JSONEncoder):
                 "title": o.title,
                 "number_of_pages": o.number_of_pages,
                 "raw_info": o.raw_info,
-                "content" : o.content
-                } 
-        else:
-            # Base class will raise the TypeError.
-            return super().default(o)
+                "content": o.content,
+            }
+        # Base class will raise the TypeError.
+        return super().default(o)

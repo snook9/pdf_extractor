@@ -6,6 +6,7 @@ import pytest
 
 from pdfextractor import create_app
 
+
 @pytest.fixture
 def app():
     """Create and configure a new app instance for each test."""
@@ -13,6 +14,7 @@ def app():
     app = create_app({"TESTING": True})
 
     yield app
+
 
 @pytest.fixture
 def client(app):

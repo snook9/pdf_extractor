@@ -169,6 +169,14 @@ In case of **error**, the following response is returned:
 
 # Test
 
+## pylint
+
+    $ apt install pylint
+    $ export PYTHONPATH="venv/lib/python3.9/site-packages/"
+    $ pylint pdfextractor/*
+
+## pytest
+
     $ pip install '.[test]'
     $ pytest
 
