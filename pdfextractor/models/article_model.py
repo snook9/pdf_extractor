@@ -27,8 +27,9 @@ class ArticleModel(Base):
     # Table name in the database
     __tablename__ = "file"
     # Internal ID is used to store the real ID (in database) after the session close
-    _internal_id = None
+    internal_id = None
     # ID primary key in the database
+    # Nota: this id is wiped after a session.close()
     id = Column("id", Integer, primary_key=True)
     # Datetime column in the database
     datetime = Column("datetime", String(255))
@@ -128,7 +129,7 @@ class ArticleModel(Base):
         session.add(self)
         session.commit()
         # We save the ID cause it will wiped after the session.close()
-        self._internal_id = self.id
+        self.internal_id = self.id
         session.close()
 
     def persist(self, filename: str):
@@ -175,7 +176,7 @@ class ArticleModel(Base):
                         info,
                         "".join(data),
                     )
-                    return self._internal_id
+                    return self.internal_id
         return None
 
 
@@ -188,7 +189,7 @@ class ArticleEncoder(json.JSONEncoder):
             if None is doc_id:
                 # If None, the object was created after a INSERT query,
                 # so, the internal_id is the table id
-                doc_id = o._internal_id
+                doc_id = o.internal_id
 
             return {
                 "id": doc_id,
