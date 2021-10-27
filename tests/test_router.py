@@ -3,6 +3,8 @@
 # Tool for parsing and extracting PDF file content
 
 import json
+from pdfextractor.models.article_model import ArticleModel
+from pdfextractor import create_app
 
 def test_index(client):
     """Test the index route"""
@@ -18,11 +20,13 @@ def test_index(client):
     assert response.status == "200 OK"
 
 def test_get_document(client):
-    """Test the /documents/<id> route
-
-    Important: This test can pass if the first line of the database is not empty!
-    SO, YOU NEED FIRST TO UPLOAD ONE FILE, AT LEAST, WITH THE APP (started normaly)
-    """
+    """Test the /documents/<id> route"""
+    # To insert a first document in the database (in case the db is empty)
+    with create_app({"TESTING": True}).app_context():
+        ArticleModel().persist("article.pdf")
+    
+    # Now, the first document exists
+    # So, we get it
     response = client.get("/documents/1")
     data = json.loads(response.get_data(as_text=True))
 
