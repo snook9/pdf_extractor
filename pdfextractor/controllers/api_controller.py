@@ -53,7 +53,7 @@ class ApiController:
                 return Response(
                     json.dumps(MessageModel("No file part"), cls=MessageEncoder),
                     mimetype="application/json;charset=utf-8",
-                )
+                ), 400
 
             # Else, we get the file
             file = request.files["file"]
@@ -64,7 +64,7 @@ class ApiController:
                 return Response(
                     json.dumps(MessageModel("No selected file"), cls=MessageEncoder),
                     mimetype="application/json;charset=utf-8",
-                )
+                ), 400
 
             # If the file's type is allowed
             if file and ApiController._allowed_file(file.filename):
@@ -83,7 +83,7 @@ class ApiController:
                             cls=MessageEncoder,
                         ),
                         mimetype="application/json;charset=utf-8",
-                    )
+                    ), 400
                 # Else, returning the ID of the object in the database
                 return Response(
                     json.dumps(
@@ -94,7 +94,7 @@ class ApiController:
                         cls=MessageEncoder,
                     ),
                     mimetype="application/json;charset=utf-8",
-                )
+                ), 201
 
             # Else, the file's type is not allowed
             return Response(
@@ -102,7 +102,7 @@ class ApiController:
                     MessageModel("This file's type is not allowed!"), cls=MessageEncoder
                 ),
                 mimetype="application/json;charset=utf-8",
-            )
+            ), 400
 
         # Check if the application returns a message
         # NO MORE USED CURRENTLY
@@ -152,11 +152,11 @@ class ApiController:
             return Response(
                 json.dumps(MessageModel("No document found"), cls=MessageEncoder),
                 mimetype="application/json;charset=utf-8",
-            )
+            ), 404
         return Response(
             json.dumps(MessageModel("Incorrect HTTP method"), cls=MessageEncoder),
             mimetype="application/json;charset=utf-8",
-        )
+        ), 405
 
     @staticmethod
     def get_text(request, doc_id: int):
@@ -188,8 +188,8 @@ class ApiController:
             return Response(
                 json.dumps(MessageModel("No document found"), cls=MessageEncoder),
                 mimetype="application/json;charset=utf-8",
-            )
+            ), 404
         return Response(
             json.dumps(MessageModel("Incorrect HTTP method"), cls=MessageEncoder),
             mimetype="application/json;charset=utf-8",
-        )
+        ), 405
