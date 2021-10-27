@@ -135,7 +135,7 @@ class ApiController:
                 data = {}
                 data["id"] = user_obj.id
                 data["status"] = "SUCCESS"
-                data["uploaded_datetime"] = user_obj.datetime
+                data["uploaded_date"] = user_obj.date
                 data["author"] = user_obj.author
                 data["creator"] = user_obj.creator
                 data["producer"] = user_obj.producer

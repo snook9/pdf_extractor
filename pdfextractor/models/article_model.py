@@ -31,8 +31,8 @@ class ArticleModel(Base):
     # ID primary key in the database
     # Nota: this id is wiped after a session.close()
     id = Column("id", Integer, primary_key=True)
-    # Datetime column in the database
-    datetime = Column("datetime", String(255))
+    # Date and time column in the database
+    date = Column("date", String(255))
     # Author PDF meta data
     author = Column("author", String(255))
     # Creator PDF meta data
@@ -52,7 +52,7 @@ class ArticleModel(Base):
 
     def __init__(
         self: object,
-        datetime: str = None,
+        date: str = None,
         author: str = None,
         creator: str = None,
         producer: str = None,
@@ -65,7 +65,7 @@ class ArticleModel(Base):
         """Initialize the object
 
         Args:
-            datetime (str, optional): to force datetime. Defaults to None.
+            date (str, optional): to force date and time. Defaults to None.
             author (str, optional): to force author. Defaults to None.
             creator (str, optional): to force creator. Defaults to None.
             producer (str, optional): to force producer. Defaults to None.
@@ -75,7 +75,7 @@ class ArticleModel(Base):
             raw_info (str, optional): to force raw_info. Defaults to None.
             content (str, optional): to force content. Defaults to None.
         """
-        self.datetime = str(datetime)
+        self.date = str(date)
         self.author = str(author)
         self.creator = str(creator)
         self.producer = str(producer)
@@ -93,7 +93,7 @@ class ArticleModel(Base):
 
     def _persist(
         self,
-        datetime: str,
+        date: str,
         author: str,
         creator: str,
         producer: str,
@@ -106,7 +106,7 @@ class ArticleModel(Base):
         """Private method to persist the object in the database
 
         Args:
-            datetime (str): datetime field
+            date (str): date field
             author (str): author field
             creator (str): creator field
             producer (str): producer field
@@ -117,7 +117,7 @@ class ArticleModel(Base):
             content (str): content field
         """
         session = session_factory()
-        self.datetime = str(datetime)
+        self.date = str(date)
         self.author = str(author)
         self.creator = str(creator)
         self.producer = str(producer)
@@ -193,7 +193,7 @@ class ArticleEncoder(json.JSONEncoder):
 
             return {
                 "id": doc_id,
-                "datetime": o.datetime,
+                "date": o.date,
                 "author": o.author,
                 "creator": o.creator,
                 "producer": o.producer,
