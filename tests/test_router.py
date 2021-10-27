@@ -9,15 +9,15 @@ from pdfextractor import create_app
 def test_index(client):
     """Test the index route"""
     response = client.get("/")
-    assert response.status == "200 OK"
+    assert response.status_code == 200
     response = client.get("/documents")
-    assert response.status == "200 OK"
+    assert response.status_code == 200
     # Test uploading a file
     data = {
-        'file': (b"my file contents", "test_file.txt"), # we use StringIO to simulate file object
+        'file': (b"my file contents", "test_file.txt"),
     }
     response = client.post("/", data=data)
-    assert response.status == "200 OK"
+    assert response.status_code == 400
 
 def test_get_document(client):
     """Test the /documents/<id> route"""
@@ -31,6 +31,6 @@ def test_get_document(client):
     data = json.loads(response.get_data(as_text=True))
 
     # The status must be 200 OK
-    assert response.status == "200 OK"
+    assert response.status_code == 200
     # We test if we received the ID of the JSON object
     assert data["id"] == 1

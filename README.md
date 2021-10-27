@@ -116,7 +116,7 @@ Get the status of an uploaded file and show his meta data:
         # May be "SUCCESS"... others values are not supported currently (str)
         "status": "[status]",
         # Date and time when the file was uploaded, format "2021-10-26-13-42-01.496144" (str)
-        "uploaded_datetime": "[datetime]",
+        "uploaded_date": "[date]",
         # Author specified in the PDF file as meta data (str)
         "author": "[author]",
         # Creator specified in the PDF file as meta data (str)
@@ -173,7 +173,7 @@ In case of **error**, the following response is returned:
 
     $ apt install pylint
     $ export PYTHONPATH="venv/lib/python3.9/site-packages/"
-    $ pylint pdfextractor/*
+    $ pylint --disable too-many-instance-attributes --disable too-few-public-methods --disable too-many-arguments --disable c-extension-no-member pdfextractor/*
 
 ## pytest
 
