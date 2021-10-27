@@ -1,21 +1,27 @@
 FROM debian:10
 
-# INSTALLATION
-RUN apt update \
-    && apt install -yf \
+# DEPENDENCIES
+RUN apt update -q -y
+RUN apt install -yf \
     build-essential libpoppler-cpp-dev pkg-config python3-dev \
+    python3 \
     python3-pip \
     git
 
-#RUN git clone git@gitlab-student.centralesupelec.fr:jonathan.cassaing/pdfextractor.git
+# APP INSTALLATION
 COPY * /PdfExtractor/
 WORKDIR /PdfExtractor/
-RUN python -m venv venv
-RUN . venv/bin/activate
-RUN pip install -r requirements.txt
-RUN export FLASK_APP=pdfextractor; \
-    export FLASK_ENV=development
-RUN flask run
 
-#EXPOSE 80
-#EXPOSE 443
+RUN python3 --version
+RUN pip3 install virtualenv
+RUN virtualenv venv
+RUN . venv/bin/activate
+RUN python3 -m pip install --upgrade pip
+RUN pip3 install -r requirements.txt
+RUN pip3 install '.[test]'
+
+# APP
+RUN export FLASK_APP=pdfextractor \
+    export FLASK_ENV=development
+
+ENTRYPOINT ["flask run"]
