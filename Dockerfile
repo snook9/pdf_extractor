@@ -5,23 +5,18 @@ RUN apt update -q -y
 RUN apt install -yf \
     build-essential libpoppler-cpp-dev pkg-config python3-dev \
     python3 \
-    python3-pip \
-    git
+    python3-pip
 
 # APP INSTALLATION
-COPY * /PdfExtractor/
+COPY ./ /PdfExtractor/
 WORKDIR /PdfExtractor/
 
 RUN python3 --version
-RUN pip3 install virtualenv
-RUN virtualenv venv
-RUN . venv/bin/activate
-RUN python3 -m pip install --upgrade pip
-RUN pip3 install -r requirements.txt
-RUN pip3 install '.[test]'
+RUN pip3 install -r requirements.txt \
+    && pip3 install '.[test]'
 
-# APP
-RUN export FLASK_APP=pdfextractor \
-    export FLASK_ENV=development
+ENV FLASK_APP pdfextractor
+ENV FLASK_ENV production
+EXPOSE 5000
 
-ENTRYPOINT ["flask run"]
+ENTRYPOINT ["python3", "-m", "flask", "run", "--host=0.0.0.0"]
