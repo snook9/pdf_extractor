@@ -4,10 +4,9 @@ Authors: Jonathan CASSAING
 Tool for parsing and extracting PDF file content
 """
 
+from pathlib import Path
 from flask import Flask
 from pdfextractor import router
-from pathlib import Path
-
 
 def create_app(test_config=None):
     """Create and configure the flask app with the factory pattern"""
