@@ -7,6 +7,7 @@ Tool for parsing and extracting PDF file content
 from datetime import datetime
 from pathlib import Path
 import json
+from multiprocessing import Process
 # pdftotext is used to extract PDF content (text body)
 import pdftotext
 # PyPDF2 is used to extract PDF meta data
@@ -15,7 +16,6 @@ from flask import current_app as app
 from sqlalchemy import Column, Integer, String
 from pdfextractor.common.base import Base
 from pdfextractor.common.base import session_factory
-from multiprocessing import Process
 
 class ArticleModel(Base):
     """Class for representing Article entity and his Data Access Object
@@ -107,7 +107,7 @@ class ArticleModel(Base):
         number_of_pages: int = None,
         raw_info: str = None,
         content: str = None,
-        id: int = None,
+        object_id: int = None,
     ):
         """Private method to persist/update the object in the database
 
@@ -121,10 +121,10 @@ class ArticleModel(Base):
             number_of_pages (int): number_of_pages field
             raw_info (str): raw_info field
             content (str): content field
-            id (int): none for inserting a new object, otherwise - id of the object to update
+            object_id (int): none for inserting a new object, otherwise - id of the object to update
         """
         session = session_factory()
-        if None == id:
+        if object_id is None:
             self.status = "PENDING"
             self.date = str(date)
             self.author = str(author)
@@ -137,7 +137,7 @@ class ArticleModel(Base):
             self.content = str(content)
             session.add(self)
         else:
-            article_model = session.query(ArticleModel).get(id)
+            article_model = session.query(ArticleModel).get(object_id)
             article_model.status = "SUCCESS"
             article_model.date = str(date)
             article_model.author = str(author)
@@ -152,17 +152,18 @@ class ArticleModel(Base):
         session.commit()
         # We save the ID cause it will wiped after the session.close()
         self.internal_id = self.id
-        session.close()   
+        session.close()
 
         return self.internal_id
 
-    def _async_extract_and_persist(self, filename: Path, id: int):
+    def _async_extract_and_persist(self, filename: Path, object_id: int):
         """Private method to extract then update a PDF object in the database
-        You must use persist() without parameter before, to get the id of your futur line in the database
+        You must use persist() without parameter before,
+        to get the id of your futur line in the database
 
         Args:
             filename (str): filename of the target file
-            id (int): id of the database line to update
+            object_id (int): id of the database line to update
 
         Returns:
             int: ID of the persisted object in the database.
@@ -199,15 +200,17 @@ class ArticleModel(Base):
                     number_of_pages,
                     info,
                     "".join(data),
-                    id
+                    object_id
                 )
                 return self.internal_id
 
     def extract_and_persist(self, filename: Path):
         """Public method to extract then persist a PDF object in the database
         First, this method ask an ID for the futur line in the database, then,
-        this method create a process for extracting data and persisting the object in the database.
-        This method returns the ID of the object in the database which will be inserted when the process will finish.
+        this method create a process for extracting data and
+        persisting the object in the database.
+        This method returns the ID of the object in the database
+        which will be inserted when the process will finish.
 
         Args:
             filename (str): filename of the target file
@@ -218,12 +221,12 @@ class ArticleModel(Base):
         """
         if str(filename).rsplit(".", 1)[1].lower() == "pdf":
             # We persist an empty object just to get the ID of the line in the database
-            id = self._persist()
+            object_id = self._persist()
 
-            process = Process(target=self._async_extract_and_persist, args=(filename, id))
+            process = Process(target=self._async_extract_and_persist, args=(filename, object_id))
             process.start()
 
-            return id
+            return object_id
 
         return None
 
