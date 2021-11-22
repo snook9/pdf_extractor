@@ -15,7 +15,8 @@ from flask import current_app as app
 from sqlalchemy import Column, Integer, String
 from pdfextractor.common.base import Base
 from pdfextractor.common.base import session_factory
-
+from multiprocessing import Process
+import time
 
 class ArticleModel(Base):
     """Class for representing Article entity and his Data Access Object
@@ -93,17 +94,18 @@ class ArticleModel(Base):
 
     def _persist(
         self,
-        date: str,
-        author: str,
-        creator: str,
-        producer: str,
-        subject: str,
-        title: str,
-        number_of_pages: int,
-        raw_info: str,
-        content: str,
+        date: str = None,
+        author: str = None,
+        creator: str = None,
+        producer: str = None,
+        subject: str = None,
+        title: str = None,
+        number_of_pages: int = None,
+        raw_info: str = None,
+        content: str = None,
+        id: int = None,
     ):
-        """Private method to persist the object in the database
+        """Private method to persist/update the object in the database
 
         Args:
             date (str): date field
@@ -115,25 +117,99 @@ class ArticleModel(Base):
             number_of_pages (int): number_of_pages field
             raw_info (str): raw_info field
             content (str): content field
+            id (int): none for inserting a new object, otherwise - id of the object to update
         """
         session = session_factory()
-        self.date = str(date)
-        self.author = str(author)
-        self.creator = str(creator)
-        self.producer = str(producer)
-        self.subject = str(subject)
-        self.title = str(title)
-        self.number_of_pages = number_of_pages
-        self.raw_info = str(raw_info)
-        self.content = str(content)
-        session.add(self)
+        if None == id:
+            self.date = str(date)
+            self.author = str(author)
+            self.creator = str(creator)
+            self.producer = str(producer)
+            self.subject = str(subject)
+            self.title = str(title)
+            self.number_of_pages = number_of_pages
+            self.raw_info = str(raw_info)
+            self.content = str(content)
+            session.add(self)
+        else:
+            # n sec before save...
+            # TODO Temp à supprimer
+            i = 0
+            while i < 30:
+                time.sleep(1)
+                print("sleep", i)
+                i += 1
+
+            article_model = session.query(ArticleModel).get(id)
+            article_model.date = str(date)
+            article_model.author = str(author)
+            article_model.creator = str(creator)
+            article_model.producer = str(producer)
+            article_model.subject = str(subject)
+            article_model.title = str(title)
+            article_model.number_of_pages = number_of_pages
+            article_model.raw_info = str(raw_info)
+            article_model.content = str(content)
+
         session.commit()
         # We save the ID cause it will wiped after the session.close()
         self.internal_id = self.id
-        session.close()
+        session.close()   
 
-    def persist(self, filename: Path):
-        """Public method to extract then persist a PDF file content/meta info in the database
+        return self.internal_id
+
+    def _async_extract_and_persist(self, filename: Path, id: int):
+        """Private method to extract then update a PDF object in the database
+        You must use persist() without parameter before, to get the id of your futur line in the database
+
+        Args:
+            filename (str): filename of the target file
+            id (int): id of the database line to update
+
+        Returns:
+            int: ID of the persisted object in the database.
+        """
+        today = datetime.today().strftime("%Y-%m-%d-%H-%M-%S.%f")
+        # Create a unique filename
+        output_filepath = self._output_folder / Path("file_" + today + ".txt")
+
+        with open(filename, "rb") as file:
+            # Extracting the text (content)
+            data = pdftotext.PDF(file)
+
+            # Extracting meta data
+            pdf = PdfFileReader(file)
+            info = pdf.getDocumentInfo()
+            number_of_pages = pdf.getNumPages()
+            author = info.author
+            creator = info.creator
+            producer = info.producer
+            subject = info.subject
+            title = info.title
+
+            with open(output_filepath, "w", encoding="utf-8") as file:
+                # Saving content to a text file
+                file.write("\n".join(data))
+                # Saving content AND meta data to the database
+                self._persist(
+                    today,
+                    author,
+                    creator,
+                    producer,
+                    subject,
+                    title,
+                    number_of_pages,
+                    info,
+                    "".join(data),
+                    id
+                )
+                return self.internal_id
+
+    def extract_and_persist(self, filename: Path):
+        """Public method to extract then persist a PDF object in the database
+        First, this method ask an ID for the futur line in the database, then,
+        this method create a process for extracting data and persisting the object in the database.
+        This method returns the ID of the object in the database which will be inserted when the process will finish.
 
         Args:
             filename (str): filename of the target file
@@ -142,43 +218,16 @@ class ArticleModel(Base):
             int: ID of the persisted object in the database,
             otherwise - returns None if the file's type is not supported.
         """
-        today = datetime.today().strftime("%Y-%m-%d-%H-%M-%S.%f")
-        # Create a unique filename
-        output_filepath = self._output_folder / Path("file_" + today + ".txt")
-
         if str(filename).rsplit(".", 1)[1].lower() == "pdf":
-            with open(filename, "rb") as file:
-                # Extracting the text (content)
-                data = pdftotext.PDF(file)
+            # We persist an empty object just to get the ID of the line in the database
+            id = self._persist()
 
-                # Extracting meta data
-                pdf = PdfFileReader(file)
-                info = pdf.getDocumentInfo()
-                number_of_pages = pdf.getNumPages()
-                author = info.author
-                creator = info.creator
-                producer = info.producer
-                subject = info.subject
-                title = info.title
+            process = Process(target=self._async_extract_and_persist, args=(filename, id))
+            process.start()
 
-                with open(output_filepath, "w", encoding="utf-8") as file:
-                    # Saving content to a text file
-                    file.write("\n".join(data))
-                    # Saving content AND meta data to the database
-                    self._persist(
-                        today,
-                        author,
-                        creator,
-                        producer,
-                        subject,
-                        title,
-                        number_of_pages,
-                        info,
-                        "".join(data),
-                    )
-                    return self.internal_id
+            return id
+
         return None
-
 
 class ArticleEncoder(json.JSONEncoder):
     """Class for converting full object to JSON string"""
