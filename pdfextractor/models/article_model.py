@@ -16,7 +16,6 @@ from sqlalchemy import Column, Integer, String
 from pdfextractor.common.base import Base
 from pdfextractor.common.base import session_factory
 from multiprocessing import Process
-import time
 
 class ArticleModel(Base):
     """Class for representing Article entity and his Data Access Object
@@ -32,6 +31,8 @@ class ArticleModel(Base):
     # ID primary key in the database
     # Nota: this id is wiped after a session.close()
     id = Column("id", Integer, primary_key=True)
+    # Status column in the database
+    status = Column("status", String(255))
     # Date and time column in the database
     date = Column("date", String(255))
     # Author PDF meta data
@@ -53,6 +54,7 @@ class ArticleModel(Base):
 
     def __init__(
         self: object,
+        status: str = None,
         date: str = None,
         author: str = None,
         creator: str = None,
@@ -66,6 +68,7 @@ class ArticleModel(Base):
         """Initialize the object
 
         Args:
+            status (str, optional): to force status. Defaults to None.
             date (str, optional): to force date and time. Defaults to None.
             author (str, optional): to force author. Defaults to None.
             creator (str, optional): to force creator. Defaults to None.
@@ -76,6 +79,7 @@ class ArticleModel(Base):
             raw_info (str, optional): to force raw_info. Defaults to None.
             content (str, optional): to force content. Defaults to None.
         """
+        self.status = str(status)
         self.date = str(date)
         self.author = str(author)
         self.creator = str(creator)
@@ -121,6 +125,7 @@ class ArticleModel(Base):
         """
         session = session_factory()
         if None == id:
+            self.status = "PENDING"
             self.date = str(date)
             self.author = str(author)
             self.creator = str(creator)
@@ -132,15 +137,8 @@ class ArticleModel(Base):
             self.content = str(content)
             session.add(self)
         else:
-            # n sec before save...
-            # TODO Temp à supprimer
-            i = 0
-            while i < 30:
-                time.sleep(1)
-                print("sleep", i)
-                i += 1
-
             article_model = session.query(ArticleModel).get(id)
+            article_model.status = "SUCCESS"
             article_model.date = str(date)
             article_model.author = str(author)
             article_model.creator = str(creator)
@@ -242,6 +240,7 @@ class ArticleEncoder(json.JSONEncoder):
 
             return {
                 "id": doc_id,
+                "status": o.status,
                 "date": o.date,
                 "author": o.author,
                 "creator": o.creator,

@@ -134,7 +134,7 @@ class ApiController:
                 # We build the JSON response
                 data = {}
                 data["id"] = user_obj.id
-                data["status"] = "SUCCESS"
+                data["status"] = user_obj.status
                 data["uploaded_date"] = user_obj.date
                 data["author"] = user_obj.author
                 data["creator"] = user_obj.creator
