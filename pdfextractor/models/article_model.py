@@ -132,7 +132,7 @@ class ArticleModel(Base):
         self.internal_id = self.id
         session.close()
 
-    def persist(self, filename: str):
+    def persist(self, filename: Path):
         """Public method to extract then persist a PDF file content/meta info in the database
 
         Args:
@@ -146,7 +146,7 @@ class ArticleModel(Base):
         # Create a unique filename
         output_filepath = self._output_folder / Path("file_" + today + ".txt")
 
-        if filename.rsplit(".", 1)[1].lower() == "pdf":
+        if str(filename).rsplit(".", 1)[1].lower() == "pdf":
             with open(filename, "rb") as file:
                 # Extracting the text (content)
                 data = pdftotext.PDF(file)
