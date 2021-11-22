@@ -72,8 +72,8 @@ class ApiController:
                 filepath = Path().joinpath(app.config["UPLOAD_FOLDER"], filename)
                 # Save the file in an upload folder
                 file.save(filepath)
-                # Persist the file in the database
-                doc_id = ArticleModel().persist(filepath)
+                # Extract and persist the file in the database
+                doc_id = ArticleModel().extract_and_persist(filepath)
                 # If failed
                 if None is doc_id:
                     # Returns the appropriate error
@@ -134,7 +134,7 @@ class ApiController:
                 # We build the JSON response
                 data = {}
                 data["id"] = user_obj.id
-                data["status"] = "SUCCESS"
+                data["status"] = user_obj.status
                 data["uploaded_date"] = user_obj.date
                 data["author"] = user_obj.author
                 data["creator"] = user_obj.creator
