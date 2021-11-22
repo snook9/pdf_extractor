@@ -23,7 +23,7 @@ def test_get_document(client):
     """Test the /documents/<id> route"""
     # To insert a first document in the database (in case the db is empty)
     with create_app({"TESTING": True}).app_context():
-        ArticleModel().persist("article.pdf")
+        ArticleModel().persist("tests/article.pdf")
     
     # Now, the first document exists
     # So, we get it

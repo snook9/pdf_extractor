@@ -4,8 +4,8 @@ Authors: Jonathan CASSAING
 Tool for parsing and extracting PDF file content
 """
 
-import os
 import json
+from pathlib import Path
 from flask import Response, render_template
 from flask import current_app as app
 from werkzeug.utils import secure_filename
@@ -13,7 +13,6 @@ from sqlalchemy import select
 from pdfextractor.models.article_model import ArticleModel
 from pdfextractor.models.message_model import MessageEncoder, MessageModel
 from pdfextractor.common.base import session_factory
-
 
 class ApiController:
     """ApiController of the PdfExtractor software"""
@@ -70,10 +69,11 @@ class ApiController:
             if file and ApiController._allowed_file(file.filename):
                 # Check user input
                 filename = secure_filename(file.filename)
+                filepath = Path().joinpath(app.config["UPLOAD_FOLDER"], filename)
                 # Save the file in an upload folder
-                file.save(os.path.join(app.config["UPLOAD_FOLDER"], filename))
+                file.save(filepath)
                 # Persist the file in the database
-                doc_id = ArticleModel().persist(filename)
+                doc_id = ArticleModel().persist(filepath)
                 # If failed
                 if None is doc_id:
                     # Returns the appropriate error
