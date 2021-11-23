@@ -3,6 +3,7 @@
 # Tool for parsing and extracting PDF file content
 
 import json
+import time
 from pdfextractor.models.article_model import ArticleModel
 from pdfextractor import create_app
 
@@ -23,8 +24,8 @@ def test_get_document(client):
     """Test the /documents/<id> route"""
     # To insert a first document in the database (in case the db is empty)
     with create_app({"TESTING": True}).app_context():
-        ArticleModel().persist("tests/article.pdf")
-    
+        ArticleModel().extract_and_persist("tests/article.pdf")
+
     # Now, the first document exists
     # So, we get it
     response = client.get("/documents/1")

@@ -110,6 +110,7 @@ class ArticleModel(Base):
         object_id: int = None,
     ):
         """Private method to persist/update the object in the database
+        Warning: this method is not thread safe and a lock could be appropriate...
 
         Args:
             date (str): date field
