@@ -178,7 +178,7 @@ In case of **error**, the following response is returned:
     $ pip install '.[test]'
     $ pytest
 
-Run with coverage report::
+Run with coverage report:
 
     $ export PYTHONPATH="venv/lib/python3.9/site-packages/"
     $ coverage run -m pytest
