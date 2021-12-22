@@ -11,58 +11,56 @@ This sofware is a RESTful/JSON API which offers the following features:
 
 # Install
 
-## OS Dependencies: pdftotext
+## With Docker
+
+    $ sudo docker build -t pdfextractor .
+
+## With Linux or Mac OS
+
+### Dependencies: pdftotext
 
 These instructions assume you're using Python 3 on a recent OS. Package names may differ for Python 2 or for an older OS.
 
-### Debian, Ubuntu, and friends
+#### Debian, Ubuntu, and friends
 
-    sudo apt install build-essential libpoppler-cpp-dev pkg-config python3-dev
+    $ sudo apt install build-essential libpoppler-cpp-dev pkg-config python3-dev
 
-### Fedora, Red Hat, and friends
+#### Fedora, Red Hat, and friends
 
-    sudo yum install gcc-c++ pkgconfig poppler-cpp-devel python3-devel
+    $ sudo yum install gcc-c++ pkgconfig poppler-cpp-devel python3-devel
 
-### macOS
+#### macOS
     
-    brew install pkg-config poppler python
+    $ brew install pkg-config poppler python
 
-### Windows
-
-Currently tested only when using conda:
-
-- Install the Microsoft Visual C++ Build Tools
-- Install poppler through conda:
-
-    conda install -c conda-forge poppler
-
-## PdfExtractor
+### PdfExtractor
 
 Create a virtualenv and activate it:
 
     $ python -m venv venv
     $ . venv/bin/activate
 
-Or on Windows cmd::
-
-    $ py -3 -m venv venv
-    $ venv\Scripts\activate.bat
-
 Install PdfExtractor:
 
     $ pip install -r requirements.txt
 
+## With Windows OS
+
+Sorry, this app is not currently compatible with Windows... Please use Docker instead
+
 # Run
+
+## With Docker
+
+    $ sudo docker run -d -p 5000:5000 pdfextractor
+
+## With Linux or Mac OS
 
     $ export FLASK_APP=pdfextractor
     $ export FLASK_ENV=development
     $ flask run
 
-Or on Windows cmd::
-
-    > set FLASK_APP=pdfextractor
-    > set FLASK_ENV=development
-    > flask run
+# Usage
 
 Open http://localhost:5000 in a browser to try the software or use the following API.
 
@@ -82,7 +80,7 @@ Post a file to the server:
 
     {
         # ID of the uploaded PDF file, otherwise 'null' if error (int)
-        "id": [id], 
+        "id": [id],
         # Explicit human readable status message (str)
         "message": "[message]"}"
     }
@@ -113,7 +111,7 @@ Get the status of an uploaded file and show his meta data:
         # Important: when the id is null, the other fields are not provided and
         # a generic "message" json field give an explicit human readable message (see below)
         "id": [id], 
-        # May be "SUCCESS"... others values are not supported currently (str)
+        # May be "SUCCESS", "PENDING" or "ERROR" (str)
         "status": "[status]",
         # Date and time when the file was uploaded, format "2021-10-26-13-42-01.496144" (str)
         "uploaded_date": "[date]",
@@ -133,7 +131,7 @@ Get the status of an uploaded file and show his meta data:
         "raw_info": "[raw_info]"
     }
 
-In case of **error**, the following response is returned:
+In case of **error** not linked with the PDF file, the following response is returned:
 
     {
         "id": null,
@@ -182,6 +180,7 @@ In case of **error**, the following response is returned:
 
 Run with coverage report::
 
+    $ export PYTHONPATH="venv/lib/python3.9/site-packages/"
     $ coverage run -m pytest
     $ coverage report
     $ coverage html  # open htmlcov/index.html in a browser
