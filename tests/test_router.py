@@ -3,7 +3,6 @@
 # Tool for parsing and extracting PDF file content
 
 import json
-import time
 
 from sqlalchemy.sql.expression import null
 from pdfextractor.models.article_model import ArticleModel
@@ -39,6 +38,12 @@ def test_get_document(client):
     # We test if we received the ID of the JSON object
     assert data["id"] == 1
 
+    response = client.get("/documents/1000000000")
+    assert response.status_code == 404
+
+    response = client.post("/documents/1")
+    assert response.status_code == 405
+
 def test_get_text(client):
     """Test the /text/<id> route"""
     # To insert a first document in the database (in case the db is empty)
@@ -54,3 +59,9 @@ def test_get_text(client):
     assert response.status_code == 200
     # We test if we received the content of the PDF
     assert data["content"] is not None
+
+    response = client.get("/text/1000000000")
+    assert response.status_code == 404
+
+    response = client.post("/text/1")
+    assert response.status_code == 405
