@@ -3,7 +3,7 @@
 # Tool for parsing and extracting PDF file content
 
 import json
-
+import io
 from sqlalchemy.sql.expression import null
 from pdfextractor.models.article_model import ArticleModel
 from pdfextractor import create_app
@@ -15,12 +15,22 @@ def test_index(client):
     response = client.get("/documents")
     assert response.status_code == 200
 
-    # Test uploading a file with a forbidden extension
-    data = {
-        'file': (b"my file contents", "test_file.txt"),
-    }
-    response = client.post("/", data=data)
+    data = dict()
+
+    # Test uploading a file without file part
+    data["file"] = b"my file content", "test_file.txt"
+    response = client.post("/", data=data, content_type="multipart/form-data")
     assert response.status_code == 400
+
+    # Test uploading a file with a forbidden extension
+    data["file"] = io.BytesIO(b"my file content"), "test_file.txt"
+    response = client.post("/", data=data, content_type="multipart/form-data")
+    assert response.status_code == 400
+
+    # Test uploading a pdf file
+    data["file"] = io.BytesIO(b"my file content"), "test_file.pdf"
+    response = client.post("/", data=data, content_type="multipart/form-data")
+    assert response.status_code == 201
 
 def test_get_document(client):
     """Test the /documents/<id> route"""
