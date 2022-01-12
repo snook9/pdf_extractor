@@ -16,4 +16,5 @@ PyPDF2==1.26.0
 pytest==6.2.5
 SQLAlchemy==1.4.26
 toml==0.10.2
+waitress==2.0.0
 Werkzeug==2.0.2

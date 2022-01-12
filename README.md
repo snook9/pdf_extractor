@@ -56,8 +56,14 @@ Sorry, this app is not currently compatible with Windows... Please use Docker in
 
 ## With Linux or Mac OS
 
+### In production
+
+    python3 main.py
+
+### In developement
+
     export FLASK_APP=pdfextractor
-    export FLASK_ENV=production
+    export FLASK_ENV=development
     flask run
 
 # Usage
