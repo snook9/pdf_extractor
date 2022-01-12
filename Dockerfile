@@ -15,8 +15,6 @@ RUN python3 --version
 RUN pip3 install -r requirements.txt \
     && pip3 install '.[test]'
 
-ENV FLASK_APP pdfextractor
-ENV FLASK_ENV production
 EXPOSE 5000
 
-ENTRYPOINT ["python3", "-m", "flask", "run", "--host=0.0.0.0"]
+ENTRYPOINT ["python3", "main.py"]
