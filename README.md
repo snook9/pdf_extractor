@@ -2,18 +2,18 @@
 
 Tool for parsing and extracting PDF file content.
 This sofware is a RESTful/JSON API which offers the following features:
-- upload a PDF file,
+- upload a PDF file (with POST HTTP Request). Then, this software will:
   - extract PDF content and meta data,
-  - store the PDF content and meta data in a database,
+  - store the PDF content and meta data in a database (SQLite),
   - save the PDF content in a text file,
-- retreive the PDF meta data,
-- retreive the PDF content.
+- retreive the PDF meta data (with GET HTTP Request),
+- retreive the PDF content (with GET HTTP Request).
 
 # Install
 
 ## With Docker
 
-    $ sudo docker build -t pdfextractor .
+    sudo docker build -t pdfextractor .
 
 ## With Linux or Mac OS
 
@@ -23,26 +23,26 @@ These instructions assume you're using Python 3 on a recent OS. Package names ma
 
 #### Debian, Ubuntu, and friends
 
-    $ sudo apt install build-essential libpoppler-cpp-dev pkg-config python3-dev
+    sudo apt install build-essential libpoppler-cpp-dev pkg-config python3-dev
 
 #### Fedora, Red Hat, and friends
 
-    $ sudo yum install gcc-c++ pkgconfig poppler-cpp-devel python3-devel
+    sudo yum install gcc-c++ pkgconfig poppler-cpp-devel python3-devel
 
 #### macOS
     
-    $ brew install pkg-config poppler python
+    brew install pkg-config poppler python
 
 ### PdfExtractor
 
 Create a virtualenv and activate it:
 
-    $ python -m venv venv
-    $ . venv/bin/activate
+    python3 -m venv venv
+    . venv/bin/activate
 
 Install PdfExtractor:
 
-    $ pip install -r requirements.txt
+    pip install -r requirements.txt
 
 ## With Windows OS
 
@@ -52,17 +52,23 @@ Sorry, this app is not currently compatible with Windows... Please use Docker in
 
 ## With Docker
 
-    $ sudo docker run -d -p 5000:5000 pdfextractor
+    sudo docker run -d -p 5000:5000 pdfextractor
 
 ## With Linux or Mac OS
 
-    $ export FLASK_APP=pdfextractor
-    $ export FLASK_ENV=development
-    $ flask run
+### In production
+
+    python3 main.py
+
+### In developement
+
+    export FLASK_APP=pdfextractor
+    export FLASK_ENV=development
+    flask run
 
 # Usage
 
-Open http://localhost:5000 in a browser to try the software or use the following API.
+Open http://localhost:5000 in a browser to try the software or use the following RESTful API.
 
 ## API specification
 
@@ -87,7 +93,7 @@ Post a file to the server:
 
 **Example:**
     
-    $ curl -F 'file=@article.pdf' localhost:5000
+    curl -F 'file=@article.pdf' localhost:5000
 
 The posted files will be saved in the 'data' directory, in a raw text file, according to the 'config.cfg' file.
 
@@ -139,6 +145,10 @@ In case of **error** not linked with the PDF file, the following response is ret
         "message": "[message]"
     }
 
+**Example:**
+    
+    curl localhost:5000/documents/1
+
 ### Text of an uploaded file
 
 Get the text (content) of an uploaded file:
@@ -165,22 +175,26 @@ In case of **error**, the following response is returned:
         "message": "[message]"
     }
 
+**Example:**
+    
+    curl localhost:5000/text/1
+
 # Test
 
 ## pylint
 
-    $ apt install pylint
-    $ export PYTHONPATH="venv/lib/python3.9/site-packages/"
-    $ pylint --disable too-many-instance-attributes --disable too-few-public-methods --disable too-many-arguments --disable c-extension-no-member pdfextractor/*
+    apt install pylint
+    export PYTHONPATH="venv/lib/python3.9/site-packages/"
+    pylint --disable too-many-instance-attributes --disable too-few-public-methods --disable too-many-arguments --disable c-extension-no-member pdfextractor/*
 
 ## pytest
 
-    $ pip install '.[test]'
-    $ pytest
+    pip install '.[test]'
+    pytest
 
 Run with coverage report:
 
-    $ export PYTHONPATH="venv/lib/python3.9/site-packages/"
-    $ coverage run -m pytest
-    $ coverage report
-    $ coverage html  # open htmlcov/index.html in a browser
+    export PYTHONPATH="venv/lib/python3.9/site-packages/"
+    coverage run -m pytest
+    coverage report
+    coverage html  # open htmlcov/index.html in a browser
